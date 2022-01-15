@@ -89,3 +89,7 @@ REVISION
 !/lib/locales.js
 !/lib/image_providers
 !/lib/locales
+
+# Invalid project lock files
+package-lock.json
+yarn.lock
