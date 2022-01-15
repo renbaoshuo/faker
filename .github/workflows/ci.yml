@@ -19,9 +19,9 @@ jobs:
         with:
           node-version: '16'
           cache: 'pnpm'
-      - run: npm ci
-      - run: npm run build
-      - run: npm run test
+      - run: pnpm install
+      - run: pnpm run build
+      - run: pnpm run test
   lint:
     runs-on: ubuntu-latest
     name: 'Linting'
@@ -34,6 +34,6 @@ jobs:
         with:
           node-version: '16'
           cache: 'pnpm'
-      - run: npm ci
-      - run: npm run build
-      - run: npm run lint
+      - run: pnpm install
+      - run: pnpm run build
+      - run: pnpm run lint
