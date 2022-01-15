@@ -12,10 +12,13 @@ jobs:
     name: 'Testing'
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 6
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-          cache: 'npm'
+          cache: 'pnpm'
       - run: npm ci
       - run: npm run build
       - run: npm run test
@@ -24,10 +27,13 @@ jobs:
     name: 'Linting'
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 6
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-          cache: 'npm'
+          cache: 'pnpm'
       - run: npm ci
       - run: npm run build
       - run: npm run lint
