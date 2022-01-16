@@ -86,6 +86,7 @@ REVISION
 .history
 
 /lib/*
-!/lib/locales.js
 !/lib/image_providers
 !/lib/locales
+/lib/locales/index.d.ts
+/lib/locales/index.js
