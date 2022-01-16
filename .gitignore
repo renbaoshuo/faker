@@ -87,6 +87,3 @@ REVISION
 
 /lib/*
 !/lib/image_providers
-!/lib/locales
-/lib/locales/index.d.ts
-/lib/locales/index.js
