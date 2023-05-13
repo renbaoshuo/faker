@@ -12,6 +12,7 @@ module.exports = defineConfig({
     browser: true,
     node: true,
   },
+  reportUnusedDisableDirectives: true,
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -24,31 +25,57 @@ module.exports = defineConfig({
     sourceType: 'module',
     warnOnUnsupportedTypeScriptVersion: false,
   },
-  plugins: ['@typescript-eslint', 'prettier'],
+  plugins: ['@typescript-eslint', 'prettier', 'deprecation'],
   rules: {
     // We may want to use this in the future
     'no-useless-escape': 'off',
+    eqeqeq: ['error', 'always', { null: 'ignore' }],
+    'no-else-return': 'error',
+    'prefer-template': 'error',
 
-    '@typescript-eslint/ban-ts-comment': 'warn',
+    'deprecation/deprecation': 'error',
+
+    '@typescript-eslint/array-type': [
+      'error',
+      { default: 'array-simple', readonly: 'generic' },
+    ],
+    '@typescript-eslint/ban-ts-comment': 'error',
     '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'error',
+    '@typescript-eslint/naming-convention': [
+      'error',
+      {
+        format: ['PascalCase'],
+        selector: ['class', 'interface', 'typeAlias', 'enumMember'],
+        leadingUnderscore: 'forbid',
+        trailingUnderscore: 'forbid',
+      },
+      {
+        format: ['PascalCase'],
+        selector: ['typeParameter'],
+        prefix: ['T'],
+        leadingUnderscore: 'forbid',
+        trailingUnderscore: 'forbid',
+      },
+    ],
     '@typescript-eslint/no-inferrable-types': [
       'error',
       { ignoreParameters: true },
     ],
-    '@typescript-eslint/no-unsafe-argument': 'warn',
+    '@typescript-eslint/no-unsafe-argument': 'error',
     '@typescript-eslint/no-unsafe-assignment': 'off',
     '@typescript-eslint/no-unsafe-call': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'off',
-    '@typescript-eslint/no-unsafe-return': 'warn',
+    '@typescript-eslint/no-unsafe-return': 'error',
+    '@typescript-eslint/padding-line-between-statements': [
+      'error',
+      { blankLine: 'always', prev: 'block-like', next: '*' },
+    ],
     '@typescript-eslint/restrict-template-expressions': [
       'error',
-      {
-        allowNumber: true,
-        allowBoolean: true,
-      },
+      { allowNumber: true, allowBoolean: true },
     ],
-    '@typescript-eslint/unbound-method': 'warn',
+    '@typescript-eslint/unbound-method': 'off',
   },
   overrides: [
     {
@@ -61,10 +88,23 @@ module.exports = defineConfig({
         'jsdoc/require-returns-type': 'off',
         'jsdoc/require-returns': 'off',
         'jsdoc/tag-lines': 'off',
-
-        // Rule will come in one of the next releases: https://github.com/gajus/eslint-plugin-jsdoc/pull/833
-        // We want to explicitly set this rule to error in the future
-        // 'jsdoc/sort-tags': 'warn',
+        'jsdoc/sort-tags': [
+          'error',
+          {
+            tagSequence: [
+              { tags: ['template'] },
+              { tags: ['internal'] },
+              { tags: ['param'] },
+              { tags: ['returns'] },
+              { tags: ['throws'] },
+              { tags: ['see'] },
+              { tags: ['example'] },
+              { tags: ['since'] },
+              { tags: ['default'] },
+              { tags: ['deprecated'] },
+            ],
+          },
+        ],
       },
       settings: {
         jsdoc: {
@@ -74,7 +114,10 @@ module.exports = defineConfig({
     },
     {
       files: ['test/*.spec.ts'],
+      extends: ['plugin:vitest/recommended'],
       rules: {
+        'deprecation/deprecation': 'off',
+
         '@typescript-eslint/restrict-template-expressions': [
           'error',
           {
@@ -83,6 +126,9 @@ module.exports = defineConfig({
             allowAny: true,
           },
         ],
+
+        'vitest/expect-expect': 'off',
+        'vitest/valid-expect': ['error', { maxArgs: 2 }],
       },
     },
   ],

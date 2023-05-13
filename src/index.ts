@@ -1,177 +1,131 @@
-import { Address } from './address';
-import { Animal } from './animal';
-import { Commerce } from './commerce';
-import { Company } from './company';
-import { Database } from './database';
-import { Datatype } from './datatype';
-import { _Date } from './date';
-import type { LocaleDefinition } from './definitions';
 export type {
-  AddressDefinitions,
-  AnimalDefinitions,
-  CommerceDefinitions,
-  CommerceProductNameDefinitions,
-  CompanyDefinitions,
-  DatabaseDefinitions,
-  DateDefinitions,
+  AirlineDefinition,
+  /** @deprecated Use AirlineDefinition instead */
+  AirlineDefinition as AirlineDefinitions,
+  AnimalDefinition,
+  /** @deprecated Use AnimalDefinition instead */
+  AnimalDefinition as AnimalDefinitions,
+  ColorDefinition,
+  /** @deprecated Use ColorDefinition instead */
+  ColorDefinition as ColorDefinitions,
+  CommerceDefinition,
+  /** @deprecated Use CommerceDefinition instead */
+  CommerceDefinition as CommerceDefinitions,
+  CommerceProductNameDefinition,
+  /** @deprecated Use CommerceProductNameDefinition instead */
+  CommerceProductNameDefinition as CommerceProductNameDefinitions,
+  CompanyDefinition,
+  /** @deprecated Use CompanyDefinition instead */
+  CompanyDefinition as CompanyDefinitions,
+  DatabaseDefinition,
+  /** @deprecated Use DatabaseDefinition instead */
+  DatabaseDefinition as DatabaseDefinitions,
+  DateDefinition,
+  /** @deprecated Use DateDefinition instead */
+  DateDefinition as DateDefinitions,
   DateEntryDefinition,
-  DefinitionTypes,
-  FinanceCurrencyEntryDefinitions,
-  FinanceDefinitions,
-  HackerDefinitions,
-  InternetDefinitions,
+  FinanceDefinition,
+  /** @deprecated Use FinanceDefinition instead */
+  FinanceDefinition as FinanceDefinitions,
+  HackerDefinition,
+  /** @deprecated Use HackerDefinition instead */
+  HackerDefinition as HackerDefinitions,
+  InternetDefinition,
+  /** @deprecated Use InternetDefinition instead */
+  InternetDefinition as InternetDefinitions,
   LocaleDefinition,
-  LoremDefinitions,
-  MusicDefinitions,
-  NameDefinitions,
-  NameTitleDefinitions,
-  PhoneNumberDefinitions,
-  SystemDefinitions,
-  SystemMimeTypeEntryDefinitions,
-  VehicleDefinitions,
-  WordDefinitions,
+  LocaleEntry,
+  /** @deprecated Use LocationDefinitions instead */
+  LocationDefinition as AddressDefinitions,
+  LocationDefinition,
+  LoremDefinition,
+  /** @deprecated Use LoremDefinition instead */
+  LoremDefinition as LoremDefinitions,
+  MetadataDefinition,
+  MusicDefinition,
+  /** @deprecated Use MusicDefinition instead */
+  MusicDefinition as MusicDefinitions,
+  /** @deprecated Use PersonDefinitions instead */
+  PersonDefinition as NameDefinitions,
+  PersonDefinition,
+  /** @deprecated Use PersonTitleDefinitions instead */
+  PersonTitleDefinition as NameTitleDefinitions,
+  PersonTitleDefinition,
+  PhoneNumberDefinition,
+  /** @deprecated Use PhoneNumberDefinition instead */
+  PhoneNumberDefinition as PhoneNumberDefinitions,
+  ScienceDefinition,
+  /** @deprecated Use ScienceDefinition instead */
+  ScienceDefinition as ScienceDefinitions,
+  SystemDefinition,
+  /** @deprecated Use SystemDefinition instead */
+  SystemDefinition as SystemDefinitions,
+  SystemMimeTypeEntryDefinition,
+  /** @deprecated Use SystemMimeTypeEntryDefinition instead */
+  SystemMimeTypeEntryDefinition as SystemMimeTypeEntryDefinitions,
+  VehicleDefinition,
+  /** @deprecated Use VehicleDefinition instead */
+  VehicleDefinition as VehicleDefinitions,
+  WordDefinition,
+  /** @deprecated Use WordDefinition instead */
+  WordDefinition as WordDefinitions,
 } from './definitions';
-import { DEFINITIONS } from './definitions';
-import { Fake } from './fake';
-import { Finance } from './finance';
-import { Git } from './git';
-import { Hacker } from './hacker';
-import { Helpers } from './helpers';
-import { Image } from './image';
-import { Internet } from './internet';
-import type { KnownLocale } from './locales';
-import allLocales from './locales';
-import { Lorem } from './lorem';
-import { Mersenne } from './mersenne';
-import { Music } from './music';
-import { Name } from './name';
-import { Phone } from './phone';
-import { Random } from './random';
-import { System } from './system';
-import { Time } from './time';
-import { Unique } from './unique';
-import { Vehicle } from './vehicle';
-import { Word } from './word';
-
-// https://github.com/microsoft/TypeScript/issues/29729#issuecomment-471566609
-type LiteralUnion<T extends U, U = string> = T | (U & { zz_IGNORE_ME?: never });
-
-export type UsableLocale = LiteralUnion<KnownLocale>;
-export type UsedLocales = Partial<Record<UsableLocale, LocaleDefinition>>;
-
-export interface FakerOptions {
-  locales?: UsedLocales;
-  locale?: UsableLocale;
-  localeFallback?: UsableLocale;
-}
-
-export class Faker {
-  locales: UsedLocales;
-  locale: UsableLocale;
-  localeFallback: UsableLocale;
-
-  // Will be lazy init
-  readonly definitions: LocaleDefinition = {} as LocaleDefinition;
-
-  seedValue?: any[] | any;
-
-  readonly fake: Fake['fake'] = new Fake(this).fake;
-  readonly unique: Unique['unique'] = new Unique().unique;
-
-  readonly mersenne: Mersenne = new Mersenne();
-  random: Random = new Random(this);
-
-  readonly helpers: Helpers = new Helpers(this);
-
-  datatype: Datatype = new Datatype(this);
-
-  readonly address: Address = new Address(this);
-  readonly animal: Animal = new Animal(this);
-  readonly commerce: Commerce = new Commerce(this);
-  readonly company: Company = new Company(this);
-  readonly database: Database = new Database(this);
-  readonly date: _Date = new _Date(this);
-  readonly finance = new Finance(this);
-  readonly git: Git = new Git(this);
-  readonly hacker: Hacker = new Hacker(this);
-  // TODO @Shinigami92 2022-01-12: iban was not used
-  // readonly iban = new (require('./iban'))(this);
-  readonly image: Image = new Image(this);
-  readonly internet: Internet = new Internet(this);
-  readonly lorem: Lorem = new Lorem(this);
-  readonly music: Music = new Music(this);
-  readonly name: Name = new Name(this);
-  readonly phone: Phone = new Phone(this);
-  readonly system: System = new System(this);
-  readonly time: Time = new Time();
-  readonly vehicle: Vehicle = new Vehicle(this);
-  readonly word: Word = new Word(this);
-
-  constructor(opts: FakerOptions = {}) {
-    this.locales = this.locales || opts.locales || {};
-    this.locale = this.locale || opts.locale || 'en';
-    this.localeFallback = this.localeFallback || opts.localeFallback || 'en';
-
-    this.loadDefinitions();
-  }
-
-  /**
-   * Load the definitions contained in the locales file for the given types
-   */
-  private loadDefinitions(): void {
-    // TODO @Shinigami92 2022-01-11: Find a way to load this even more dynamically
-    // In a way so that we don't accidentally miss a definition
-    Object.entries(DEFINITIONS).forEach(([t, v]) => {
-      if (typeof this.definitions[t] === 'undefined') {
-        this.definitions[t] = {};
-      }
-
-      if (typeof v === 'string') {
-        this.definitions[t] = v;
-        return;
-      }
-
-      v.forEach((p) => {
-        Object.defineProperty(this.definitions[t], p, {
-          get: () => {
-            if (
-              typeof this.locales[this.locale][t] === 'undefined' ||
-              typeof this.locales[this.locale][t][p] === 'undefined'
-            ) {
-              // certain localization sets contain less data then others.
-              // in the case of a missing definition, use the default localeFallback
-              // to substitute the missing set data
-              // throw new Error('unknown property ' + d + p)
-              return this.locales[this.localeFallback][t][p];
-            } else {
-              // return localized data
-              return this.locales[this.locale][t][p];
-            }
-          },
-        });
-      });
-    });
-  }
-
-  seed(value?: any[] | any): void {
-    this.seedValue = value;
-    this.random = new Random(this, this.seedValue);
-    this.datatype = new Datatype(this, this.seedValue);
-  }
-
-  /**
-   * Set Faker's locale
-   *
-   * @param locale
-   */
-  setLocale(locale: UsableLocale): void {
-    this.locale = locale;
-  }
-}
-
-// since we are requiring the top level of faker, load all locales by default
-export const faker: Faker = new Faker({
-  locales: allLocales,
-});
-
-export default faker;
+export { FakerError } from './errors/faker-error';
+export { Faker } from './faker';
+export type { FakerOptions } from './faker';
+export * from './locale';
+export { fakerEN as faker } from './locale';
+export * from './locales';
+export * as allLocales from './locales';
+export { Aircraft } from './modules/airline';
+export type { AircraftType, AirlineModule } from './modules/airline';
+export type { AnimalModule } from './modules/animal';
+export { CssFunction, CssSpace } from './modules/color';
+export type {
+  Casing,
+  ColorFormat,
+  ColorModule,
+  /** @deprecated Use CssFunctionType instead */
+  CssFunctionType as CSSFunction,
+  CssFunctionType,
+  /** @deprecated Use CssSpaceType instead */
+  CssSpaceType as CSSSpace,
+  CssSpaceType,
+  NumberColorFormat,
+  StringColorFormat,
+} from './modules/color';
+export type { CommerceModule } from './modules/commerce';
+export type { CompanyModule } from './modules/company';
+export type { DatabaseModule } from './modules/database';
+export type { DatatypeModule } from './modules/datatype';
+export type { DateModule } from './modules/date';
+export type { Currency, FinanceModule } from './modules/finance';
+export type { GitModule } from './modules/git';
+export type { HackerModule } from './modules/hacker';
+export type { HelpersModule } from './modules/helpers';
+export type { ImageModule } from './modules/image';
+export type { InternetModule } from './modules/internet';
+export type {
+  /** @deprecated Use LocationModule instead */
+  LocationModule as AddressModule,
+  LocationModule,
+} from './modules/location';
+export type { LoremModule } from './modules/lorem';
+export type { MusicModule } from './modules/music';
+export type { NumberModule } from './modules/number';
+export { Sex } from './modules/person';
+export type {
+  /** @deprecated Use PersonModule instead */
+  PersonModule as NameModule,
+  PersonModule,
+  SexType,
+} from './modules/person';
+export type { PhoneModule } from './modules/phone';
+// eslint-disable-next-line deprecation/deprecation
+export type { RandomModule } from './modules/random';
+export type { ChemicalElement, ScienceModule, Unit } from './modules/science';
+export type { StringModule } from './modules/string';
+export type { SystemModule } from './modules/system';
+export type { VehicleModule } from './modules/vehicle';
+export type { WordModule } from './modules/word';
+export { mergeLocales } from './utils/merge-locales';

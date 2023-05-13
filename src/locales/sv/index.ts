@@ -3,25 +3,28 @@
  * Run 'pnpm run generate:locales' to update.
  */
 import type { LocaleDefinition } from '../..';
-import address from './address';
 import cell_phone from './cell_phone';
+import color from './color';
 import commerce from './commerce';
 import company from './company';
 import date from './date';
 import internet from './internet';
-import name_ from './name';
+import location from './location';
+import metadata from './metadata';
+import person from './person';
 import phone_number from './phone_number';
 import team from './team';
 
 const sv: LocaleDefinition = {
-  title: 'Swedish',
-  address,
   cell_phone,
+  color,
   commerce,
   company,
   date,
   internet,
-  name: name_,
+  location,
+  metadata,
+  person,
   phone_number,
   team,
 };

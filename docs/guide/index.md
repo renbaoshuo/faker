@@ -21,68 +21,20 @@ You can run Faker in the Browser, within Node, or the many other languages suppo
 
 Install it as a Dev Dependency using your favorite package manager.
 
-```shell
+::: code-group
+
+```shell [npm]
 npm install @faker-js/faker --save-dev
 ```
 
-or
-
-```shell
-yarn add @faker-js/faker --dev
-```
-
-or
-
-```shell
+```shell [pnpm]
 pnpm add @faker-js/faker --save-dev
 ```
 
-## Usage
-
-### Node.js
-
-```js
-import { faker } from '@faker-js/faker';
-
-const randomName = faker.name.findName(); // Rowan Nikolaus
-const randomEmail = faker.internet.email(); // Kassandra.Haley@erich.biz
-const randomCard = faker.helpers.createCard(); // An object representing a random contact card containing many properties
+```shell [yarn]
+yarn add @faker-js/faker --dev
 ```
 
-### Browser
-
-```html
-<script type="text/javascript" src="https://unpkg.com/@faker-js/faker"></script>
-
-<script>
-  // Caitlyn Kerluke
-  const randomName = faker.name.findName();
-
-  // Rusty@arne.info
-  const randomEmail = faker.internet.email();
-
-  // An object representing a random contact card
-  // containing many properties
-  const randomCard = faker.helpers.createCard();
-</script>
-```
-
-:::tip Note
-Using the browser is great for experimenting 👍. However, due to all of the strings Faker uses to generate fake data, **Faker is a large package**. It's `> 5 MiB` minified. **Please avoid deploying Faker in your web app.**
-:::
-
-### Deno
-
-```js
-import { faker } from 'https://cdn.skypack.dev/@faker-js/faker';
-
-const randomName = faker.name.findName(); // Willie Bahringer
-const randomEmail = faker.internet.email(); // Tomasa_Ferry14@hotmail.com
-const randomCard = faker.helpers.createCard(); // random contact card containing many properties
-```
-
-:::tip Note
-It is highly recommended to use version tags when importing libraries in Deno, e.g: `import { faker } from "https://cdn.skypack.dev/@faker-js/faker@v6.0.0"`. Add `?dts` to import with type definitions: `import { faker } from "https://cdn.skypack.dev/@faker-js/faker@v6.0.0?dts"`.
 :::
 
 ## Community

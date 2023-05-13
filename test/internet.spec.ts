@@ -1,137 +1,171 @@
 import validator from 'validator';
-import { afterEach, describe, expect, it } from 'vitest';
-import { faker } from '../src';
+import { describe, expect, it } from 'vitest';
+import { allFakers, faker } from '../src';
+import { seededTests } from './support/seededRuns';
 import { times } from './support/times';
 
-const seededRuns = [
-  {
-    seed: 42,
-    expectations: {
-      avatar:
-        'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/468.jpg',
-      email: 'Peyton73@yahoo.com',
-      exampleEmail: 'Peyton73@example.com',
-      userName: 'Garnett.Schinner73',
-      protocol: 'http',
-      httpMethod: 'POST',
-      url: 'http://stable-vehicle.biz',
-      domainName: 'harmonious-shift.org',
-      domainSuffix: 'info',
-      domainWord: 'harmonious-shift',
-      ip: '95.203.243.46',
-      ipv6: '5cf2:bc99:2721:07d5:92ba:00fb:df30:2f29',
-      port: 24545,
-      userAgent:
-        'Mozilla/5.0 (Windows; U; Windows NT 6.2) AppleWebKit/538.0.2 (KHTML, like Gecko) Chrome/29.0.815.0 Safari/538.0.2',
-      color: '#30667a',
-      mac: '5c:f2:bc:99:27:21',
-      password: 'Dl2fkYYKLsZdepz',
-    },
-  },
-  {
-    seed: 1337,
-    expectations: {
-      avatar:
-        'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/327.jpg',
-      email: 'Keith27@gmail.com',
-      exampleEmail: 'Keith27@example.org',
-      userName: 'Devyn21',
-      protocol: 'http',
-      httpMethod: 'POST',
-      url: 'http://neat-chopsticks.biz',
-      domainName: 'fabulous-might.com',
-      domainSuffix: 'biz',
-      domainWord: 'fabulous-might',
-      ip: '67.143.40.54',
-      ipv6: '4823:4870:5389:45f4:b41c:61a5:2bf2:7dcc',
-      port: 17172,
-      userAgent:
-        'Mozilla/5.0 (Windows; U; Windows NT 6.1) AppleWebKit/532.0.0 (KHTML, like Gecko) Chrome/13.0.832.0 Safari/532.0.0',
-      color: '#214814',
-      mac: '48:23:48:70:53:89',
-      password: '9V05TL7RY9fmECg',
-    },
-  },
-  {
-    seed: 1211,
-    expectations: {
-      avatar:
-        'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1160.jpg',
-      email: 'Jadon.Trantow12@hotmail.com',
-      exampleEmail: 'Jadon.Trantow12@example.net',
-      userName: 'Tito_Koch22',
-      protocol: 'https',
-      httpMethod: 'PATCH',
-      url: 'https://joyous-temperature.net',
-      domainName: 'verifiable-infection.org',
-      domainSuffix: 'org',
-      domainWord: 'verifiable-infection',
-      ip: '237.117.228.199',
-      ipv6: 'e7ec:32f0:a2a3:c652:bbd0:caab:de64:dfdf',
-      port: 60851,
-      userAgent:
-        'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_6 rv:3.0; PT) AppleWebKit/538.2.0 (KHTML, like Gecko) Version/4.1.0 Safari/538.2.0',
-      color: '#773a72',
-      mac: 'e7:ec:32:f0:a2:a3',
-      password: 'yLuj60b5iHB0bhn',
-    },
-  },
-];
-
-const NON_SEEDED_BASED_RUN = 500;
-
-const functionNames = [
-  'avatar',
-  'email',
-  'exampleEmail',
-  'userName',
-  'protocol',
-  'httpMethod',
-  'url',
-  'domainName',
-  'domainSuffix',
-  'domainWord',
-  'ip',
-  'ipv6',
-  'port',
-  'userAgent',
-  'color',
-  'mac',
-  'password',
-];
+const NON_SEEDED_BASED_RUN = 5;
 
 describe('internet', () => {
-  afterEach(() => {
-    faker.locale = 'en';
+  seededTests(faker, 'internet', (t) => {
+    t.itEach(
+      'avatar',
+      'protocol',
+      'httpMethod',
+      'domainName',
+      'domainSuffix',
+      'domainWord',
+      'ip',
+      'ipv4',
+      'ipv6',
+      'port',
+      'userAgent'
+    );
+
+    t.describe('email', (t) => {
+      t.it('noArgs')
+        .it('with firstName option', { firstName: 'Jane' })
+        .it('with lastName option', { lastName: 'Doe' })
+        .it('with provider option', { provider: 'fakerjs.dev' })
+        .it('with allowSpecialCharacters option', {
+          allowSpecialCharacters: true,
+        })
+        .it('with all options', {
+          allowSpecialCharacters: true,
+          firstName: 'Jane',
+          lastName: 'Doe',
+          provider: 'fakerjs.dev',
+        })
+        .it('with legacy names', 'Jane', 'Doe')
+        .it('with legacy provider', undefined, undefined, 'fakerjs.dev')
+        .it('with legacy names and provider', 'Jane', 'Doe', 'fakerjs.dev');
+    });
+
+    t.describe('exampleEmail', (t) => {
+      t.it('noArgs')
+        .it('with firstName option', { firstName: 'Jane' })
+        .it('with lastName option', { lastName: 'Doe' })
+        .it('with allowSpecialCharacters option', {
+          allowSpecialCharacters: true,
+        })
+        .it('with all options', {
+          allowSpecialCharacters: true,
+          firstName: 'Jane',
+          lastName: 'Doe',
+        })
+        .it('with legacy names', 'Jane', 'Doe')
+        .it('with legacy names and options', 'Jane', 'Doe', {
+          allowSpecialCharacters: true,
+        });
+    });
+
+    t.describe('userName', (t) => {
+      t.it('noArgs')
+        .it('with firstName option', { firstName: 'Jane' })
+        .it('with lastName option', { lastName: 'Doe' })
+        .it('with all option', { firstName: 'Jane', lastName: 'Doe' })
+        .it('with legacy names', 'Jane', 'Doe')
+        .it('with Latin names', { firstName: 'Jane', lastName: 'Doe' })
+        .it('with accented names', { firstName: 'Hélene', lastName: 'Müller' })
+        .it('with Cyrillic names', {
+          firstName: 'Фёдор',
+          lastName: 'Достоевский',
+        })
+        .it('with Chinese names', { firstName: '大羽', lastName: '陳' });
+    });
+
+    t.describe('displayName', (t) => {
+      t.it('noArgs')
+        .it('with firstName option', { firstName: 'Jane' })
+        .it('with lastName option', { lastName: 'Doe' })
+        .it('with all option', { firstName: 'Jane', lastName: 'Doe' })
+        .it('with legacy names', 'Jane', 'Doe')
+        .it('with Latin names', { firstName: 'Jane', lastName: 'Doe' })
+        .it('with accented names', { firstName: 'Hélene', lastName: 'Müller' })
+        .it('with Cyrillic names', {
+          firstName: 'Фёдор',
+          lastName: 'Достоевский',
+        })
+        .it('with Chinese names', { firstName: '大羽', lastName: '陳' });
+    });
+
+    t.describe('password', (t) => {
+      t.it('noArgs')
+        .it('with length option', { length: 10 })
+        .it('with memorable option', {
+          memorable: false,
+        })
+        .it('with pattern option', {
+          pattern: /[0-9]/,
+        })
+        .it('with prefix option', {
+          prefix: 'test',
+        })
+        .it('with length, memorable, pattern and prefix option', {
+          length: 10,
+          memorable: false,
+          pattern: /[0-9]/,
+          prefix: 'test',
+        })
+        .it('with legacy length', 10)
+        .it('with legacy length and memorable', 10, false)
+        .it('with legacy length, memorable and pattern', 10, false, /[0-9]/)
+        .it(
+          'with legacy length, memorable, pattern and prefix',
+          10,
+          false,
+          /[0-9]/,
+          'test'
+        );
+    });
+
+    t.describe('httpStatusCode', (t) => {
+      t.it('noArgs').it('with options', { types: ['clientError'] });
+    });
+
+    t.describe('color', (t) => {
+      t.it('noArgs')
+        .it('with blueBase option', { blueBase: 100 })
+        .it('with greenBase option', { greenBase: 100 })
+        .it('with redBase option', { redBase: 100 })
+        .it('with all options', {
+          redBase: 100,
+          blueBase: 100,
+          greenBase: 100,
+        })
+        .it('with legacy color base', 100, 100, 100);
+    });
+
+    t.describe('mac', (t) => {
+      t.it('noArgs')
+        .it('with separator', ':')
+        .it('with separator option', { separator: '-' });
+    });
+
+    t.describe('emoji', (t) => {
+      t.it('noArgs').it('with options', { types: ['nature'] });
+    });
+
+    t.describe('url', (t) => {
+      t.it('noArgs')
+        .it('with slash appended', { appendSlash: true })
+        .it('without slash appended and with http protocol', {
+          appendSlash: false,
+          protocol: 'http',
+        });
+    });
   });
 
-  for (const { seed, expectations } of seededRuns) {
-    describe(`seed: ${seed}`, () => {
-      for (const functionName of functionNames) {
-        it(`${functionName}()`, () => {
-          faker.seed(seed);
-
-          const actual = faker.internet[functionName]();
-          expect(actual).toBeTruthy();
-          expect(actual).toEqual(expectations[functionName]);
-        });
-      }
-    });
-  }
-
-  // Create and log-back the seed for debug purposes
-  faker.seed(Math.ceil(Math.random() * 1_000_000_000));
-
-  describe(`random seeded tests for seed ${faker.seedValue}`, () => {
+  describe(`random seeded tests for seed ${faker.seed()}`, () => {
     for (let i = 1; i <= NON_SEEDED_BASED_RUN; i++) {
       describe('avatar', () => {
         it('should return a random avatar url', () => {
           const avatar = faker.internet.avatar();
 
           expect(avatar).toBeTruthy();
-          expect(typeof avatar).toBe('string');
-          expect(avatar).satisfy(validator.isURL);
-          expect(avatar).match(
+          expect(avatar).toBeTypeOf('string');
+          expect(avatar).toSatisfy(validator.isURL);
+          expect(avatar).toMatch(
             /^https:\/\/cloudflare-ipfs.com\/ipfs\/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye\/avatar\/\d+.jpg$/
           );
         });
@@ -142,51 +176,128 @@ describe('internet', () => {
           const email = faker.internet.email();
 
           expect(email).toBeTruthy();
-          expect(typeof email).toBe('string');
-          expect(email).satisfy(validator.isEmail);
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
 
           const [, suffix] = email.split('@');
           expect(faker.definitions.internet.free_email).toContain(suffix);
         });
 
-        // TODO @Shinigami92 2022-02-11: When providing params to `email`, it produces some not that predictable data
+        it.each(Object.entries(allFakers))(
+          'should return a valid email in %s',
+          (locale, localeFaker) => {
+            if (locale === 'base') {
+              return;
+            }
+
+            const email = localeFaker.internet.email();
+
+            expect(email).toBeTruthy();
+            expect(email).toBeTypeOf('string');
+            expect(email).toSatisfy(validator.isEmail);
+          }
+        );
 
         it('should return an email with given firstName', () => {
-          const email = faker.internet.email('Aiden.Harann55');
+          const email = faker.internet.email({ firstName: 'Aiden.Harann55' });
 
           expect(email).toBeTruthy();
-          expect(typeof email).toBe('string');
-          expect(email).satisfy(validator.isEmail);
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
 
           const [prefix, suffix] = email.split('@');
 
-          expect(prefix).match(/^Aiden.Harann55/);
+          expect(prefix).includes('Aiden.Harann55');
+          expect(prefix).toMatch(
+            /^(Aiden\.Harann55((\d{1,2})|([._][A-Za-z]*(\d{1,2})?)))/
+          );
           expect(faker.definitions.internet.free_email).toContain(suffix);
+        });
+
+        it('should not allow an email that starts or ends with a .', () => {
+          const email = faker.internet.email('...Aiden...', '...Doe...');
+
+          expect(email).toBeTruthy();
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
+
+          const [prefix] = email.split('@');
+          expect(prefix).not.toMatch(/^\./);
+          expect(prefix).not.toMatch(/\.$/);
+        });
+
+        it('should not allow an email with multiple dots', () => {
+          const email = faker.internet.email('Ai....den');
+
+          expect(email).toBeTruthy();
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
+
+          const [prefix] = email.split('@');
+          //expect it not to contain multiple .s
+          expect(prefix).not.toMatch(/\.{2,}/);
         });
 
         it('should return an email with given firstName and lastName', () => {
-          const email = faker.internet.email('Aiden', 'Harann');
+          const email = faker.internet.email({
+            firstName: 'Aiden',
+            lastName: 'Harann',
+          });
 
           expect(email).toBeTruthy();
-          expect(typeof email).toBe('string');
-          expect(email).satisfy(validator.isEmail);
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
 
           const [prefix, suffix] = email.split('@');
 
-          expect(prefix).match(/^Aiden([._]Harann)?\d*/);
+          expect(prefix).includes('Aiden');
+          expect(prefix).toMatch(
+            /^Aiden((\d{1,2})|([._]Harann\d{1,2})|([._](Harann)))/
+          );
           expect(faker.definitions.internet.free_email).toContain(suffix);
         });
 
-        it('should return an email with japanese characters', () => {
-          const email = faker.internet.email('思源_唐3');
+        it('should return a valid email for very long names', () => {
+          const longFirstName =
+            'Elizabeth Alexandra Mary Jane Annabel Victoria';
+          const longSurname = 'Smith Jones Davidson Brown White Greene Black';
+          const email = faker.internet.email({
+            firstName: longFirstName,
+            lastName: longSurname,
+          });
+          // should truncate to 50 chars
+          // e.g. ElizabethAlexandraMaryJaneAnnabelVictoria.SmithJon@yahoo.com
+          expect(email).toSatisfy(validator.isEmail);
+          const localPart = email.split('@')[0];
+          expect(localPart.length).toBeLessThanOrEqual(50);
+        });
+
+        it('should return a valid email for names with invalid chars', () => {
+          const email = faker.internet.email({
+            firstName: 'Matthew (Matt)',
+            lastName: 'Smith',
+          });
+          // should strip invalid chars
+          // e.g. MatthewMatt_Smith@yahoo.com
+          expect(email).toSatisfy(validator.isEmail);
+        });
+
+        it('should return an email with special characters', () => {
+          const email = faker.internet.email({
+            firstName: 'Mike',
+            lastName: 'Smith',
+            allowSpecialCharacters: true,
+          });
 
           expect(email).toBeTruthy();
-          expect(typeof email).toBe('string');
-          expect(email).satisfy(validator.isEmail);
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
 
           const [prefix, suffix] = email.split('@');
 
-          expect(prefix).match(/^思源_唐3/);
+          expect(prefix).toMatch(
+            /^Mike((\d{1,2})|([.!#$%&'*+-/=?^_`{|}~]Smith\d{1,2})|([.!#$%&'*+-/=?^_`{|}~]Smith))/
+          );
           expect(faker.definitions.internet.free_email).toContain(suffix);
         });
       });
@@ -196,55 +307,64 @@ describe('internet', () => {
           const email = faker.internet.exampleEmail();
 
           expect(email).toBeTruthy();
-          expect(typeof email).toBe('string');
-          expect(email).satisfy(validator.isEmail);
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
 
           const suffix = email.split('@')[1];
 
-          expect(suffix).match(/^example\.(com|net|org)$/);
+          expect(suffix).toMatch(/^example\.(com|net|org)$/);
           expect(faker.definitions.internet.example_email).toContain(suffix);
         });
 
         it('should return an email with the example suffix and given firstName', () => {
-          const email = faker.internet.exampleEmail('Aiden.Harann55');
+          const email = faker.internet.exampleEmail({
+            firstName: 'Aiden.Harann55',
+          });
 
           expect(email).toBeTruthy();
-          expect(typeof email).toBe('string');
-          expect(email).satisfy(validator.isEmail);
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
 
           const [prefix, suffix] = email.split('@');
 
-          expect(suffix).match(/^example\.(com|net|org)$/);
+          expect(suffix).toMatch(/^example\.(com|net|org)$/);
           expect(faker.definitions.internet.example_email).toContain(suffix);
-          expect(prefix).match(/^Aiden.Harann55/);
+          expect(prefix).toMatch(/^Aiden.Harann55/);
         });
 
         it('should return an email with the example suffix and given firstName and lastName', () => {
-          const email = faker.internet.exampleEmail('Aiden', 'Harann');
+          const email = faker.internet.exampleEmail({
+            firstName: 'Aiden',
+            lastName: 'Harann',
+          });
 
           expect(email).toBeTruthy();
-          expect(typeof email).toBe('string');
-          expect(email).satisfy(validator.isEmail);
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
 
           const [prefix, suffix] = email.split('@');
 
-          expect(suffix).match(/^example\.(com|net|org)$/);
+          expect(suffix).toMatch(/^example\.(com|net|org)$/);
           expect(faker.definitions.internet.example_email).toContain(suffix);
-          expect(prefix).match(/^Aiden([._]Harann)?\d*/);
+          expect(prefix).toMatch(/^Aiden([._]Harann)?\d*/);
         });
 
-        it('should return an email with the example suffix and japanese characters', () => {
-          const email = faker.internet.exampleEmail('思源_唐3');
+        it('should return an email with special characters', () => {
+          const email = faker.internet.exampleEmail({
+            firstName: 'Mike',
+            lastName: 'Smith',
+            allowSpecialCharacters: true,
+          });
 
           expect(email).toBeTruthy();
-          expect(typeof email).toBe('string');
-          expect(email).satisfy(validator.isEmail);
+          expect(email).toBeTypeOf('string');
+          expect(email).toSatisfy(validator.isEmail);
 
           const [prefix, suffix] = email.split('@');
 
-          expect(suffix).match(/^example\.(com|net|org)$/);
+          expect(suffix).toMatch(/^example\.(com|net|org)$/);
           expect(faker.definitions.internet.example_email).toContain(suffix);
-          expect(prefix).match(/^思源_唐3/);
+          expect(prefix).toMatch(/^Mike([.!#$%&'*+-/=?^_`{|}~]Smith)?\d*/);
         });
       });
 
@@ -253,27 +373,87 @@ describe('internet', () => {
           const username = faker.internet.userName();
 
           expect(username).toBeTruthy();
-          expect(typeof username).toBe('string');
-          expect(username).match(/\w/);
+          expect(username).toBeTypeOf('string');
+          expect(username).toMatch(/\w/);
         });
 
         it('should return a random username with given firstName', () => {
-          const username = faker.internet.userName('Aiden');
+          const username = faker.internet.userName({ firstName: 'Aiden' });
 
           expect(username).toBeTruthy();
-          expect(typeof username).toBe('string');
-          expect(username).match(/\w/);
+          expect(username).toBeTypeOf('string');
+          expect(username).toMatch(/\w/);
           expect(username).includes('Aiden');
         });
 
         it('should return a random username with given firstName and lastName', () => {
-          const username = faker.internet.userName('Aiden', 'Harann');
+          const username = faker.internet.userName({
+            firstName: 'Aiden',
+            lastName: 'Harann',
+          });
 
           expect(username).toBeTruthy();
-          expect(typeof username).toBe('string');
-          expect(username).match(/\w/);
+          expect(username).toBeTypeOf('string');
           expect(username).includes('Aiden');
-          // FIXME christopher 2022-02-11: The lastName is sometimes not taken
+          expect(username).toMatch(
+            /^Aiden((\d{1,2})|([._]Harann\d{1,2})|([._](Harann)))/
+          );
+        });
+
+        it('should strip accents', () => {
+          const username = faker.internet.userName({
+            firstName: 'Adèle',
+            lastName: 'Smith',
+          });
+          expect(username).includes('Adele');
+        });
+
+        it('should transliterate Cyrillic', () => {
+          const username = faker.internet.userName({
+            firstName: 'Амос',
+            lastName: 'Васильев',
+          });
+          expect(username).includes('Amos');
+        });
+
+        it('should provide a fallback for Chinese etc', () => {
+          const username = faker.internet.userName('大羽', '陳');
+          expect(username).includes('hlzp8d');
+        });
+      });
+
+      describe('displayName()', () => {
+        it('should return a random display name', () => {
+          const displayName = faker.internet.displayName();
+
+          expect(displayName).toBeTruthy();
+          expect(displayName).toBeTypeOf('string');
+          expect(displayName).toMatch(/\w/);
+        });
+
+        it('should return a random display name with given firstName', () => {
+          const displayName = faker.internet.displayName({
+            firstName: 'Aiden',
+          });
+
+          expect(displayName).toBeTruthy();
+          expect(displayName).toBeTypeOf('string');
+          expect(displayName).toMatch(/\w/);
+          expect(displayName).includes('Aiden');
+        });
+
+        it('should return a random display name with given firstName and lastName', () => {
+          const displayName = faker.internet.displayName({
+            firstName: 'Aiden',
+            lastName: 'Harann',
+          });
+
+          expect(displayName).toBeTruthy();
+          expect(displayName).toBeTypeOf('string');
+          expect(displayName).includes('Aiden');
+          expect(displayName).toMatch(
+            /^Aiden((\d{1,2})|([._]Harann\d{1,2})|([._](Harann)))/
+          );
         });
       });
 
@@ -281,7 +461,7 @@ describe('internet', () => {
         it('should return a valid protocol', () => {
           const protocol = faker.internet.protocol();
           expect(protocol).toBeTruthy();
-          expect(typeof protocol).toBe('string');
+          expect(protocol).toBeTypeOf('string');
           expect(protocol).toMatch(/^https?$/);
         });
       });
@@ -301,8 +481,40 @@ describe('internet', () => {
           const httpMethod = faker.internet.httpMethod();
 
           expect(httpMethod).toBeTruthy();
-          expect(typeof httpMethod).toBe('string');
+          expect(httpMethod).toBeTypeOf('string');
           expect(httpMethods).toContain(httpMethod);
+        });
+      });
+
+      describe('httpStatusCode', () => {
+        it('should return a random HTTP status code', () => {
+          const httpStatusCode = faker.internet.httpStatusCode();
+
+          expect(httpStatusCode).toBeTruthy();
+          expect(httpStatusCode).toBeTypeOf('number');
+          expect(httpStatusCode).toBeLessThanOrEqual(600);
+        });
+
+        it('should return a correct status code for multiple classes', () => {
+          const httpStatusCode = faker.internet.httpStatusCode({
+            types: ['informational', 'success', 'redirection'],
+          });
+
+          expect(httpStatusCode).toBeTruthy();
+          expect(httpStatusCode).toBeTypeOf('number');
+          expect(httpStatusCode).toBeGreaterThanOrEqual(100);
+          expect(httpStatusCode).toBeLessThan(400);
+        });
+
+        it('should return a correct status code for a single class', () => {
+          const httpStatusCode = faker.internet.httpStatusCode({
+            types: ['serverError'],
+          });
+
+          expect(httpStatusCode).toBeTruthy();
+          expect(httpStatusCode).toBeTypeOf('number');
+          expect(httpStatusCode).toBeGreaterThanOrEqual(500);
+          expect(httpStatusCode).toBeLessThan(600);
         });
       });
 
@@ -311,8 +523,25 @@ describe('internet', () => {
           const url = faker.internet.url();
 
           expect(url).toBeTruthy();
-          expect(typeof url).toBe('string');
-          expect(url).satisfy(validator.isURL);
+          expect(url).toBeTypeOf('string');
+          expect(url).toSatisfy(validator.isURL);
+        });
+
+        it('should return a valid url with slash appended at the end', () => {
+          const url = faker.internet.url({ appendSlash: true });
+
+          expect(url).toBeTruthy();
+          expect(url).toBeTypeOf('string');
+          expect(url).toSatisfy(validator.isURL);
+          expect(url.endsWith('/')).toBeTruthy();
+        });
+
+        it('should return a valid url with given protocol', () => {
+          const url = faker.internet.url({ protocol: 'http' });
+
+          expect(url).toBeTruthy();
+          expect(url).toBeTypeOf('string');
+          expect(url).toSatisfy(validator.isURL);
         });
       });
 
@@ -321,12 +550,12 @@ describe('internet', () => {
           const domainName = faker.internet.domainName();
 
           expect(domainName).toBeTruthy();
-          expect(typeof domainName).toBe('string');
-          expect(domainName).satisfy(validator.isFQDN);
+          expect(domainName).toBeTypeOf('string');
+          expect(domainName).toSatisfy(validator.isFQDN);
 
           const [prefix, suffix] = domainName.split('.');
 
-          expect(prefix).satisfy(validator.isSlug);
+          expect(prefix).toSatisfy(validator.isSlug);
           expect(faker.definitions.internet.domain_suffix).toContain(suffix);
         });
       });
@@ -336,7 +565,7 @@ describe('internet', () => {
           const domainSuffix = faker.internet.domainSuffix();
 
           expect(domainSuffix).toBeTruthy();
-          expect(typeof domainSuffix).toBe('string');
+          expect(domainSuffix).toBeTypeOf('string');
           expect(faker.definitions.internet.domain_suffix).toContain(
             domainSuffix
           );
@@ -348,21 +577,31 @@ describe('internet', () => {
           const domainWord = faker.internet.domainWord();
 
           expect(domainWord).toBeTruthy();
-          expect(typeof domainWord).toBe('string');
-          expect(domainWord).satisfy(validator.isSlug);
-          expect(domainWord).satisfy((value: string) =>
+          expect(domainWord).toBeTypeOf('string');
+          expect(domainWord).toSatisfy(validator.isSlug);
+          expect(domainWord).toSatisfy((value: string) =>
             validator.isFQDN(value, { require_tld: false })
           );
         });
       });
 
       describe('ip()', () => {
-        it('should return a random IPv4 address with four parts', () => {
+        it('should return a random IPv4 or IPv6 address', () => {
           const ip = faker.internet.ip();
 
           expect(ip).toBeTruthy();
-          expect(typeof ip).toBe('string');
-          expect(ip).satisfy((value: string) => validator.isIP(value, 4));
+          expect(ip).toBeTypeOf('string');
+          expect(ip).toSatisfy(validator.isIP);
+        });
+      });
+
+      describe('ipv4()', () => {
+        it('should return a random IPv4 with four parts', () => {
+          const ip = faker.internet.ipv4();
+
+          expect(ip).toBeTruthy();
+          expect(ip).toBeTypeOf('string');
+          expect(ip).toSatisfy((value: string) => validator.isIP(value, 4));
 
           const parts = ip.split('.');
 
@@ -370,8 +609,8 @@ describe('internet', () => {
 
           for (const part of parts) {
             expect(part).toMatch(/^\d+$/);
-            expect(+part).greaterThanOrEqual(0);
-            expect(+part).lessThanOrEqual(255);
+            expect(+part).toBeGreaterThanOrEqual(0);
+            expect(+part).toBeLessThanOrEqual(255);
           }
         });
       });
@@ -381,8 +620,8 @@ describe('internet', () => {
           const ipv6 = faker.internet.ipv6();
 
           expect(ipv6).toBeTruthy();
-          expect(typeof ipv6).toBe('string');
-          expect(ipv6).satisfy((value: string) => validator.isIP(value, 6));
+          expect(ipv6).toBeTypeOf('string');
+          expect(ipv6).toSatisfy((value: string) => validator.isIP(value, 6));
 
           const parts = ipv6.split(':');
 
@@ -394,10 +633,10 @@ describe('internet', () => {
         it('should return a random port number', () => {
           const port = faker.internet.port();
 
-          expect(typeof port).toBe('number');
-          expect(port).greaterThanOrEqual(0);
-          expect(port).lessThanOrEqual(65535);
-          expect(String(port)).satisfy(validator.isPort);
+          expect(port).toBeTypeOf('number');
+          expect(port).toBeGreaterThanOrEqual(0);
+          expect(port).toBeLessThanOrEqual(65535);
+          expect(String(port)).toSatisfy(validator.isPort);
         });
       });
 
@@ -406,8 +645,11 @@ describe('internet', () => {
           const ua = faker.internet.userAgent();
 
           expect(ua).toBeTruthy();
-          expect(typeof ua).toBe('string');
-          // TODO @Shinigami92 2022-02-11: Make tests more strict
+          expect(ua).toBeTypeOf('string');
+          expect(ua.length).toBeGreaterThanOrEqual(1);
+          expect(ua).toMatch(
+            /^(([^\d]+\/[\dA-Za-z\.]+(\s\(.*\)))|([^\d]+\/[\dA-Za-z\.]+(\s\(.*\)*))(\s[^\d]+\/[\dA-Za-z\.]+(\s\(.*\)*))*)$/
+          );
         });
       });
 
@@ -416,17 +658,20 @@ describe('internet', () => {
           const color = faker.internet.color();
 
           expect(color).toBeTruthy();
-          expect(typeof color).toBe('string');
-          expect(color).satisfy(validator.isHexColor);
+          expect(color).toBeTypeOf('string');
+          expect(color).toSatisfy(validator.isHexColor);
         });
 
         it('should return a random hex value with given values', () => {
-          // TODO @Shinigami92 2022-02-11: Understand what's going on
-          const color = faker.internet.color(100, 100, 100);
+          const color = faker.internet.color({
+            redBase: 100,
+            greenBase: 100,
+            blueBase: 100,
+          });
 
           expect(color).toBeTruthy();
-          expect(typeof color).toBe('string');
-          expect(color).satisfy(validator.isHexColor);
+          expect(color).toBeTypeOf('string');
+          expect(color).toSatisfy(validator.isHexColor);
         });
       });
 
@@ -435,28 +680,28 @@ describe('internet', () => {
           const mac = faker.internet.mac();
 
           expect(mac).toBeTruthy();
-          expect(typeof mac).toBe('string');
+          expect(mac).toBeTypeOf('string');
           expect(mac).toHaveLength(17);
-          expect(mac).match(/^([a-f0-9]{2}:){5}[a-f0-9]{2}$/);
-          expect(mac).satisfy(validator.isMACAddress);
+          expect(mac).toMatch(/^([a-f0-9]{2}:){5}[a-f0-9]{2}$/);
+          expect(mac).toSatisfy(validator.isMACAddress);
         });
 
         it('should return a random MAC address with 6 hexadecimal digits and given separator', () => {
           const mac = faker.internet.mac('-');
 
           expect(mac).toBeTruthy();
-          expect(typeof mac).toBe('string');
+          expect(mac).toBeTypeOf('string');
           expect(mac).toHaveLength(17);
-          expect(mac).match(/^([a-f0-9]{2}-){5}[a-f0-9]{2}$/);
-          expect(mac).satisfy(validator.isMACAddress);
+          expect(mac).toMatch(/^([a-f0-9]{2}-){5}[a-f0-9]{2}$/);
+          expect(mac).toSatisfy(validator.isMACAddress);
         });
 
         it('should return a random MAC address with 6 hexadecimal digits and empty separator', () => {
           const mac = faker.internet.mac('');
 
           expect(mac).toBeTruthy();
-          expect(typeof mac).toBe('string');
-          expect(mac).satisfy(validator.isHexadecimal);
+          expect(mac).toBeTypeOf('string');
+          expect(mac).toSatisfy(validator.isHexadecimal);
           expect(mac).toHaveLength(12);
           // It's not a valid MAC address
         });
@@ -467,10 +712,10 @@ describe('internet', () => {
             const mac = faker.internet.mac(separator);
 
             expect(mac).toBeTruthy();
-            expect(typeof mac).toBe('string');
+            expect(mac).toBeTypeOf('string');
             expect(mac).toHaveLength(17);
-            expect(mac).match(/^([a-f0-9]{2}:){5}[a-f0-9]{2}$/);
-            expect(mac).satisfy(validator.isMACAddress);
+            expect(mac).toMatch(/^([a-f0-9]{2}:){5}[a-f0-9]{2}$/);
+            expect(mac).toSatisfy(validator.isMACAddress);
           }
         );
       });
@@ -480,70 +725,86 @@ describe('internet', () => {
           const password = faker.internet.password();
 
           expect(password).toBeTruthy();
-          expect(typeof password).toBe('string');
+          expect(password).toBeTypeOf('string');
           expect(password).toHaveLength(15);
-          expect(password).match(/^\w{15}$/);
+          expect(password).toMatch(/^\w{15}$/);
         });
 
         it.each(times(32))(
           'should return random password with length %i',
           (length) => {
-            const password = faker.internet.password(length);
+            const password = faker.internet.password({ length });
 
             expect(password).toBeTruthy();
-            expect(typeof password).toBe('string');
+            expect(password).toBeTypeOf('string');
             expect(password).toHaveLength(length);
-            expect(password).match(/^\w+$/);
+            expect(password).toMatch(/^\w+$/);
           }
         );
 
         it('should return memorable password', () => {
-          const password = faker.internet.password(12, true);
+          const password = faker.internet.password({
+            length: 12,
+            memorable: true,
+          });
 
           expect(password).toBeTruthy();
-          expect(typeof password).toBe('string');
+          expect(password).toBeTypeOf('string');
           expect(password).toHaveLength(12);
-          expect(password).match(/^\w{12}$/);
+          expect(password).toMatch(/^\w{12}$/);
         });
 
         it('should return non memorable password', () => {
-          const password = faker.internet.password(12, false);
+          const password = faker.internet.password({
+            length: 12,
+            memorable: false,
+          });
 
           expect(password).toBeTruthy();
-          expect(typeof password).toBe('string');
+          expect(password).toBeTypeOf('string');
           expect(password).toHaveLength(12);
-          expect(password).match(/^\w{12}$/);
+          expect(password).toMatch(/^\w{12}$/);
           // TODO @Shinigami92 2022-02-11: I would say a non memorable password should satisfy `validator.isStrongPassword`, but it does not currently
-          //expect(password).satisfy(validator.isStrongPassword);
+          //expect(password).toSatisfy(validator.isStrongPassword);
         });
 
         it('should return non memorable strong password with length 32', () => {
-          const password = faker.internet.password(
-            32,
-            false,
-            /(!|\?|&|\[|\]|%|\$|[a-zA-Z0-9])/
-          );
+          const password = faker.internet.password({
+            length: 32,
+            memorable: false,
+            pattern: /(!|\?|&|\[|\]|%|\$|[a-zA-Z0-9])/,
+          });
 
           expect(password).toBeTruthy();
-          expect(typeof password).toBe('string');
+          expect(password).toBeTypeOf('string');
           expect(password).toHaveLength(32);
           // TODO @Shinigami92 2022-02-11: This should definitely be a strong password, but it doesn't :(
-          //expect(password).satisfy(validator.isStrongPassword);
+          //expect(password).toSatisfy(validator.isStrongPassword);
         });
 
         it('should return non memorable strong password with length 32 and given prefix', () => {
-          const password = faker.internet.password(
-            32,
-            false,
-            /(!|\?|&|\[|\]|%|\$|[a-zA-Z0-9])/,
-            'a!G6'
-          );
+          const password = faker.internet.password({
+            length: 32,
+            memorable: false,
+            pattern: /(!|\?|&|\[|\]|%|\$|[a-zA-Z0-9])/,
+            prefix: 'a!G6',
+          });
 
           expect(password).toBeTruthy();
-          expect(typeof password).toBe('string');
+          expect(password).toBeTypeOf('string');
           expect(password).toHaveLength(32);
-          expect(password).match(/^a!G6/);
-          expect(password).satisfy(validator.isStrongPassword);
+          expect(password).toMatch(/^a!G6/);
+          expect(password).toSatisfy(validator.isStrongPassword);
+        });
+      });
+
+      describe('emoji', () => {
+        it('should return a random emoji', () => {
+          const emoji = faker.internet.emoji();
+
+          expect(emoji).toBeTruthy();
+          expect(emoji).toBeTypeOf('string');
+          expect(emoji.length).toBeGreaterThanOrEqual(1);
         });
       });
     }

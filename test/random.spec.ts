@@ -1,221 +1,459 @@
-import { describe, expect, it, vi } from 'vitest';
-import { faker } from '../src';
+import { describe, expect, it } from 'vitest';
+import { Faker, faker, FakerError, fakerZH_CN } from '../src';
+import { seededTests } from './support/seededRuns';
+import { times } from './support/times';
+
+const NON_SEEDED_BASED_RUN = 5;
 
 describe('random', () => {
-  describe('arrayElement', () => {
-    it('should return a random element in the array', () => {
-      const testArray = ['hello', 'to', 'you', 'my', 'friend'];
-      const actual = faker.random.arrayElement(testArray);
+  seededTests(faker, 'random', (t) => {
+    t.it('word');
+    t.skip('locale' as 'word'); // locale() has been pseudo removed
 
-      expect(testArray).toContain(actual);
+    t.describeEach(
+      'alpha',
+      'alphaNumeric',
+      'numeric'
+    )((t) => {
+      t.it('noArgs').it('with length', 5);
     });
 
-    it('should return a random element in the array when there is only 1', () => {
-      const testArray = ['hello'];
-      const actual = faker.random.arrayElement(testArray);
-
-      expect(actual).toBe('hello');
-    });
-  });
-
-  describe('arrayElements', () => {
-    it('should return a subset with random elements in the array', () => {
-      const testArray = ['hello', 'to', 'you', 'my', 'friend'];
-      const subset = faker.random.arrayElements(testArray);
-
-      // Check length
-      expect(subset.length).greaterThanOrEqual(1);
-      expect(subset.length).lessThanOrEqual(testArray.length);
-
-      // Check elements
-      subset.forEach((element) => {
-        expect(testArray).toContain(element);
-      });
-
-      // Check uniqueness
-      expect(subset).toHaveLength(new Set(subset).size);
-    });
-
-    it('should return a subset of fixed length with random elements in the array', () => {
-      const testArray = ['hello', 'to', 'you', 'my', 'friend'];
-      const subset = faker.random.arrayElements(testArray, 3);
-
-      // Check length
-      expect(subset).toHaveLength(3);
-
-      // Check elements
-      subset.forEach((element) => {
-        expect(testArray).toContain(element);
-      });
-
-      // Check uniqueness
-      expect(subset).toHaveLength(new Set(subset).size);
+    t.describe('words', (t) => {
+      t.it('noArgs')
+        .it('with length', 5)
+        .it('with length range', { min: 1, max: 5 });
     });
   });
 
-  describe('objectElement', () => {
-    it('should return a random value', () => {
-      const testObject = {
-        hello: 'to',
-        you: 'my',
-        friend: '!',
-      };
-      const actual = faker.random.objectElement(testObject);
+  describe(`random seeded tests for seed ${faker.seed()}`, () => {
+    describe.each(times(NON_SEEDED_BASED_RUN))('%s', () => {
+      describe('word', () => {
+        const bannedChars = [
+          '!',
+          '#',
+          '%',
+          '&',
+          '*',
+          ')',
+          '(',
+          '+',
+          '=',
+          '.',
+          '<',
+          '>',
+          '{',
+          '}',
+          '[',
+          ']',
+          ':',
+          ';',
+          "'",
+          '"',
+          '_',
+          '-',
+        ];
 
-      expect(Object.values(testObject)).toContain(actual);
-    });
+        it('should return a random word', () => {
+          const actual = faker.random.word();
 
-    it('should return a random key', () => {
-      const testObject = {
-        hello: 'to',
-        you: 'my',
-        friend: '!',
-      };
-      const actual = faker.random.objectElement(testObject, 'key');
+          expect(actual).toBeTruthy();
+          expect(actual).toBeTypeOf('string');
+        });
 
-      expect(Object.keys(testObject)).toContain(actual);
-    });
-  });
+        it.each(times(50))(
+          'should only contain a word without undesirable non-alpha characters (run %i)',
+          () => {
+            const actual = faker.random.word();
 
-  describe('word', () => {
-    it('should return a random word', () => {
-      const actual = faker.random.word();
-
-      expect(actual).toBeTruthy();
-      expect(typeof actual).toBe('string');
-    });
-  });
-
-  describe('words', () => {
-    it('should return random words', () => {
-      const actual = faker.random.words();
-
-      expect(actual).toBeTruthy();
-      expect(typeof actual).toBe('string');
-
-      const words = actual.split(' ');
-      expect(words.length).greaterThanOrEqual(1);
-      expect(words.length).lessThanOrEqual(3);
-    });
-
-    it('should return random words', () => {
-      const actual = faker.random.words(5);
-
-      expect(actual).toBeTruthy();
-      expect(typeof actual).toBe('string');
-
-      const words = actual.split(' ');
-      expect(words).toHaveLength(5);
-    });
-  });
-
-  describe('locale', () => {
-    it('should return a random locale', () => {
-      const actual = faker.random.locale();
-
-      expect(actual).toBeTruthy();
-      expect(typeof actual).toBe('string');
-      expect(Object.keys(faker.locales)).toContain(actual);
-    });
-  });
-
-  describe('alpha', () => {
-    it('should return single letter when no count provided', () => {
-      const actual = faker.random.alpha();
-
-      expect(actual).toHaveLength(1);
-    });
-
-    it('should return lowercase letter when no upcase option provided', () => {
-      const actual = faker.random.alpha();
-
-      expect(actual).match(/[a-z]/);
-    });
-
-    it('should return uppercase when upcase option is true', () => {
-      const actual = faker.random.alpha({ upcase: true });
-      expect(actual).match(/[A-Z]/);
-    });
-
-    it('should generate many random letters', () => {
-      const actual = faker.random.alpha(5);
-
-      expect(actual).toHaveLength(5);
-    });
-
-    it('should be able to ban some characters', () => {
-      const actual = faker.random.alpha({
-        count: 5,
-        bannedChars: ['a', 'p'],
-      });
-
-      expect(actual).toHaveLength(5);
-      expect(actual).match(/[b-oq-z]/);
-    });
-
-    it('should be able handle mistake in banned characters array', () => {
-      const alphaText = faker.random.alpha({
-        count: 5,
-        bannedChars: ['a', 'a', 'p'],
-      });
-
-      expect(alphaText).toHaveLength(5);
-      expect(alphaText).match(/[b-oq-z]/);
-    });
-  });
-
-  describe('alphaNumeric', () => {
-    it('should generate single character when no additional argument was provided', () => {
-      const actual = faker.random.alphaNumeric();
-
-      expect(actual).toHaveLength(1);
-    });
-
-    it('should generate many random characters', () => {
-      const actual = faker.random.alphaNumeric(5);
-
-      expect(actual).toHaveLength(5);
-    });
-
-    it('should be able to ban some characters', () => {
-      const alphaText = faker.random.alphaNumeric(5, {
-        bannedChars: ['a', 'p'],
-      });
-
-      expect(alphaText).toHaveLength(5);
-      expect(alphaText).match(/[b-oq-z]/);
-    });
-
-    it('should be able handle mistake in banned characters array', () => {
-      const alphaText = faker.random.alphaNumeric(5, {
-        bannedChars: ['a', 'p', 'a'],
-      });
-
-      expect(alphaText).toHaveLength(5);
-      expect(alphaText).match(/[b-oq-z]/);
-    });
-  });
-
-  describe('deprecation warnings', () => {
-    it.each([
-      ['number', 'datatype.number'],
-      ['float', 'datatype.float'],
-      ['uuid', 'datatype.uuid'],
-      ['boolean', 'datatype.boolean'],
-      ['image', 'image.image'],
-      ['hexaDecimal', 'datatype.hexaDecimal'],
-    ])(
-      'should warn user that function random.%s is deprecated',
-      (functionName, newLocation) => {
-        const spy = vi.spyOn(console, 'warn');
-
-        faker.random[functionName]();
-
-        expect(spy).toHaveBeenCalledWith(
-          `Deprecation Warning: faker.random.${functionName} is now located in faker.${newLocation}`
+            expect(actual).not.satisfy((word: string) =>
+              bannedChars.some((char) => word.includes(char))
+            );
+          }
         );
-        spy.mockRestore();
-      }
-    );
+
+        it.each(times(50))(
+          'should only contain a word without undesirable non-alpha characters, locale=zh_CN (run %i)',
+          () => {
+            const actual = fakerZH_CN.random.word();
+
+            expect(actual).not.satisfy((word: string) =>
+              bannedChars.some((char) => word.includes(char))
+            );
+          }
+        );
+
+        it('should throw error if no data are available', () => {
+          const faker = new Faker({
+            locale: [{ metadata: { title: 'custom' } }],
+          });
+
+          expect(() => faker.random.word()).toThrow();
+        });
+      });
+
+      describe('words', () => {
+        it('should return random words', () => {
+          const actual = faker.random.words();
+
+          expect(actual).toBeTruthy();
+          expect(actual).toBeTypeOf('string');
+
+          const words = actual.split(' ');
+          expect(words.length).toBeGreaterThanOrEqual(1);
+          expect(words.length).toBeLessThanOrEqual(3);
+        });
+
+        it('should return 5 random words', () => {
+          const actual = faker.random.words(5);
+
+          expect(actual).toBeTruthy();
+          expect(actual).toBeTypeOf('string');
+
+          const words = actual.split(' ');
+          expect(words).toHaveLength(5);
+        });
+
+        it('should return 3-5 random words', () => {
+          const actual = faker.random.words({ min: 3, max: 5 });
+
+          expect(actual).toBeTruthy();
+          expect(actual).toBeTypeOf('string');
+
+          const words = actual.split(' ');
+          expect(words.length).toBeGreaterThanOrEqual(3);
+          expect(words.length).toBeLessThanOrEqual(5);
+        });
+      });
+
+      describe('alpha', () => {
+        it('should return single letter when no count provided', () => {
+          const actual = faker.random.alpha();
+
+          expect(actual).toHaveLength(1);
+        });
+
+        it('should return mixed letter when no option provided', () => {
+          const actual = faker.random.alpha();
+
+          expect(actual).toMatch(/^[a-z]$/i);
+        });
+
+        it.each([
+          ['upper', /^[A-Z]{250}$/],
+          ['lower', /^[a-z]{250}$/],
+          ['mixed', /^[a-zA-Z]{250}$/],
+        ] as const)('should return %s-case', (casing, pattern) => {
+          const actual = faker.random.alpha({ count: 250, casing });
+          expect(actual).toMatch(pattern);
+        });
+
+        it('should generate many random letters', () => {
+          const actual = faker.random.alpha(5);
+
+          expect(actual).toHaveLength(5);
+        });
+
+        it.each([0, -1, -100])(
+          'should return empty string when length is <= 0',
+          (length) => {
+            const actual = faker.random.alpha(length);
+
+            expect(actual).toBe('');
+          }
+        );
+
+        it('should be able to ban some characters', () => {
+          const actual = faker.random.alpha({
+            count: 5,
+            bannedChars: ['a', 'p', 'A', 'P'],
+          });
+
+          expect(actual).toHaveLength(5);
+          expect(actual).toMatch(/^[b-oq-z]{5}$/i);
+        });
+
+        it('should be able to ban some characters via string', () => {
+          const actual = faker.random.alpha({
+            count: 5,
+            bannedChars: 'apAP',
+          });
+
+          expect(actual).toHaveLength(5);
+          expect(actual).toMatch(/^[b-oq-z]{5}$/i);
+        });
+
+        it('should be able handle mistake in banned characters array', () => {
+          const alphaText = faker.random.alpha({
+            count: 5,
+            bannedChars: ['a', 'a', 'p', 'A', 'A', 'P'],
+          });
+
+          expect(alphaText).toHaveLength(5);
+          expect(alphaText).toMatch(/^[b-oq-z]{5}$/i);
+        });
+
+        it('should throw if all possible characters being banned', () => {
+          const bannedChars =
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+          expect(() =>
+            faker.random.alpha({
+              count: 5,
+              bannedChars,
+            })
+          ).toThrow(
+            new FakerError(
+              'Unable to generate string: No characters to select from.'
+            )
+          );
+        });
+
+        it('should not mutate the input object', () => {
+          const input: {
+            count: number;
+            casing: 'mixed';
+            bannedChars: string[];
+          } = Object.freeze({
+            count: 5,
+            casing: 'mixed',
+            bannedChars: ['a', '%'],
+          });
+
+          expect(() => faker.random.alpha(input)).not.toThrow();
+          expect(input.bannedChars).toEqual(['a', '%']);
+        });
+      });
+
+      describe('alphaNumeric', () => {
+        it('should generate single character when no additional argument was provided', () => {
+          const actual = faker.random.alphaNumeric();
+
+          expect(actual).toHaveLength(1);
+        });
+
+        it.each([
+          ['upper', /^[A-Z0-9]{250}$/],
+          ['lower', /^[a-z0-9]{250}$/],
+          ['mixed', /^[a-zA-Z0-9]{250}$/],
+        ] as const)('should return %s-case', (casing, pattern) => {
+          const actual = faker.random.alphaNumeric(250, { casing });
+          expect(actual).toMatch(pattern);
+        });
+
+        it('should generate many random characters', () => {
+          const actual = faker.random.alphaNumeric(5);
+
+          expect(actual).toHaveLength(5);
+        });
+
+        it.each([0, -1, -100])(
+          'should return empty string when length is <= 0',
+          (length) => {
+            const actual = faker.random.alphaNumeric(length);
+
+            expect(actual).toBe('');
+          }
+        );
+
+        it('should be able to ban all alphabetic characters', () => {
+          const bannedChars = 'abcdefghijklmnopqrstuvwxyz'.split('');
+          const alphaText = faker.random.alphaNumeric(5, {
+            bannedChars,
+          });
+
+          expect(alphaText).toHaveLength(5);
+          for (const bannedChar of bannedChars) {
+            expect(alphaText).not.includes(bannedChar);
+          }
+        });
+
+        it('should be able to ban all alphabetic characters via string', () => {
+          const bannedChars = 'abcdefghijklmnopqrstuvwxyz';
+          const alphaText = faker.random.alphaNumeric(5, {
+            bannedChars,
+          });
+
+          expect(alphaText).toHaveLength(5);
+          for (const bannedChar of bannedChars) {
+            expect(alphaText).not.includes(bannedChar);
+          }
+        });
+
+        it('should be able to ban all numeric characters', () => {
+          const bannedChars = '0123456789'.split('');
+          const alphaText = faker.random.alphaNumeric(5, {
+            bannedChars,
+          });
+
+          expect(alphaText).toHaveLength(5);
+          for (const bannedChar of bannedChars) {
+            expect(alphaText).not.includes(bannedChar);
+          }
+        });
+
+        it('should be able to ban all numeric characters via string', () => {
+          const bannedChars = '0123456789';
+          const alphaText = faker.random.alphaNumeric(5, {
+            bannedChars,
+          });
+
+          expect(alphaText).toHaveLength(5);
+          for (const bannedChar of bannedChars) {
+            expect(alphaText).not.includes(bannedChar);
+          }
+        });
+
+        it('should be able to handle mistake in banned characters array', () => {
+          const alphaText = faker.random.alphaNumeric(5, {
+            bannedChars: ['a', 'p', 'a'],
+            casing: 'lower',
+          });
+
+          expect(alphaText).toHaveLength(5);
+          expect(alphaText).toMatch(/^[0-9b-oq-z]{5}$/);
+        });
+
+        it('should throw if all possible characters being banned', () => {
+          const bannedChars = 'abcdefghijklmnopqrstuvwxyz0123456789'.split('');
+          expect(() =>
+            faker.random.alphaNumeric(5, {
+              bannedChars,
+              casing: 'lower',
+            })
+          ).toThrow(
+            new FakerError(
+              'Unable to generate string: No characters to select from.'
+            )
+          );
+        });
+
+        it('should throw if all possible characters being banned via string', () => {
+          const bannedChars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+          expect(() =>
+            faker.random.alphaNumeric(5, {
+              bannedChars,
+              casing: 'lower',
+            })
+          ).toThrow();
+        });
+
+        it('should not mutate the input object', () => {
+          const input: {
+            bannedChars: string[];
+          } = Object.freeze({
+            bannedChars: ['a', '0', '%'],
+          });
+
+          expect(() => faker.random.alphaNumeric(5, input)).not.toThrow();
+          expect(input.bannedChars).toEqual(['a', '0', '%']);
+        });
+      });
+
+      describe('numeric', () => {
+        it('should return single digit when no length provided', () => {
+          const actual = faker.random.numeric();
+
+          expect(actual).toHaveLength(1);
+          expect(actual).toMatch(/^[0-9]$/);
+        });
+
+        it.each(times(100))(
+          'should generate random value with a length of %s',
+          (length) => {
+            const actual = faker.random.numeric(length);
+
+            expect(actual).toHaveLength(length);
+            expect(actual).toMatch(/^[0-9]*$/);
+          }
+        );
+
+        it('should return empty string with a length of 0', () => {
+          const actual = faker.random.numeric(0);
+
+          expect(actual).toHaveLength(0);
+        });
+
+        it('should return empty string with a negative length', () => {
+          const actual = faker.random.numeric(-10);
+
+          expect(actual).toHaveLength(0);
+        });
+
+        it('should return a valid numeric string with provided length', () => {
+          const actual = faker.random.numeric(1000);
+
+          expect(actual).toBeTypeOf('string');
+          expect(actual).toHaveLength(1000);
+          expect(actual).toMatch(/^[0-9]+$/);
+        });
+
+        it('should allow leading zeros via option', () => {
+          const actual = faker.random.numeric(15, { allowLeadingZeros: true });
+
+          expect(actual).toMatch(/^[0-9]+$/);
+        });
+
+        it('should allow leading zeros via option and all other digits banned', () => {
+          const actual = faker.random.numeric(4, {
+            allowLeadingZeros: true,
+            bannedDigits: '123456789'.split(''),
+          });
+
+          expect(actual).toBe('0000');
+        });
+
+        it('should allow leading zeros via option and all other digits banned via string', () => {
+          const actual = faker.random.numeric(4, {
+            allowLeadingZeros: true,
+            bannedDigits: '123456789',
+          });
+
+          expect(actual).toBe('0000');
+        });
+
+        it('should fail on leading zeros via option and all other digits banned', () => {
+          expect(() =>
+            faker.random.numeric(4, {
+              allowLeadingZeros: false,
+              bannedDigits: '123456789'.split(''),
+            })
+          ).toThrow(
+            new FakerError(
+              'Unable to generate numeric string, because all possible digits are excluded.'
+            )
+          );
+        });
+
+        it('should fail on leading zeros via option and all other digits banned via string', () => {
+          expect(() =>
+            faker.random.numeric(4, {
+              allowLeadingZeros: false,
+              bannedDigits: '123456789',
+            })
+          ).toThrow(
+            new FakerError(
+              'Unable to generate numeric string, because all possible digits are excluded.'
+            )
+          );
+        });
+
+        it('should ban all digits passed via bannedDigits', () => {
+          const actual = faker.random.numeric(1000, {
+            bannedDigits: 'c84U1'.split(''),
+          });
+
+          expect(actual).toHaveLength(1000);
+          expect(actual).toMatch(/^[0235679]{1000}$/);
+        });
+
+        it('should ban all digits passed via bannedDigits via string', () => {
+          const actual = faker.random.numeric(1000, {
+            bannedDigits: 'c84U1',
+          });
+
+          expect(actual).toHaveLength(1000);
+          expect(actual).toMatch(/^[0235679]{1000}$/);
+        });
+      });
+    });
   });
 });

@@ -1,94 +1,32 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { faker } from '../src';
-
-const seededRuns = [
-  {
-    seed: 42,
-    expectations: {
-      vehicle: 'Ford Golf',
-      manufacturer: 'Ford',
-      model: 'Escalade',
-      type: 'Extended Cab Pickup',
-      fuel: 'Electric',
-      vin: 'CTY6RSKK5ED315227',
-      color: 'grey',
-      vrm: 'JU91TUP',
-      bicycle: 'Fitness Bicycle',
-    },
-  },
-  {
-    seed: 1337,
-    expectations: {
-      vehicle: 'Dodge Model S',
-      manufacturer: 'Dodge',
-      model: 'Colorado',
-      type: 'Coupe',
-      fuel: 'Electric',
-      vin: '8J579HF1A7MK33575',
-      color: 'black',
-      vrm: 'GO12HOL',
-      bicycle: 'Cyclocross Bicycle',
-    },
-  },
-  {
-    seed: 1211,
-    expectations: {
-      vehicle: 'Toyota Challenger',
-      manufacturer: 'Toyota',
-      model: '2',
-      type: 'Wagon',
-      fuel: 'Hybrid',
-      vin: 'XFWS74Z1N5S678768',
-      color: 'azure',
-      vrm: 'YL87FDZ',
-      bicycle: 'Triathlon/Time Trial Bicycle',
-    },
-  },
-];
+import { seededTests } from './support/seededRuns';
 
 const NON_SEEDED_BASED_RUN = 5;
 
-const functionNames = [
-  'vehicle',
-  'manufacturer',
-  'model',
-  'type',
-  'fuel',
-  'vin',
-  'color',
-  'vrm',
-  'bicycle',
-];
-
 describe('vehicle', () => {
-  afterEach(() => {
-    faker.locale = 'en';
+  seededTests(faker, 'vehicle', (t) => {
+    t.itEach(
+      'vehicle',
+      'manufacturer',
+      'model',
+      'type',
+      'fuel',
+      'vin',
+      'color',
+      'vrm',
+      'bicycle'
+    );
   });
 
-  for (const { seed, expectations } of seededRuns) {
-    describe(`seed: ${seed}`, () => {
-      for (const functionName of functionNames) {
-        it(`${functionName}()`, () => {
-          faker.seed(seed);
-
-          const actual = faker.vehicle[functionName]();
-          expect(actual).toEqual(expectations[functionName]);
-        });
-      }
-    });
-  }
-
-  // Create and log-back the seed for debug purposes
-  faker.seed(Math.ceil(Math.random() * 1_000_000_000));
-
-  describe(`random seeded tests for seed ${faker.seedValue}`, () => {
+  describe(`random seeded tests for seed ${faker.seed()}`, () => {
     for (let i = 1; i <= NON_SEEDED_BASED_RUN; i++) {
       describe('vehicle()', () => {
         it('should return a random vehicle', () => {
           const vehicle = faker.vehicle.vehicle();
 
           expect(vehicle).toBeTruthy();
-          expect(typeof vehicle).toBe('string');
+          expect(vehicle).toBeTypeOf('string');
           expect(vehicle.split(' ').length).toBeGreaterThanOrEqual(2);
         });
       });
@@ -98,7 +36,7 @@ describe('vehicle', () => {
           const manufacturer = faker.vehicle.manufacturer();
 
           expect(manufacturer).toBeTruthy();
-          expect(typeof manufacturer).toBe('string');
+          expect(manufacturer).toBeTypeOf('string');
           expect(faker.definitions.vehicle.manufacturer).toContain(
             manufacturer
           );
@@ -110,7 +48,7 @@ describe('vehicle', () => {
           const model = faker.vehicle.model();
 
           expect(model).toBeTruthy();
-          expect(typeof model).toBe('string');
+          expect(model).toBeTypeOf('string');
           expect(faker.definitions.vehicle.model).toContain(model);
         });
       });
@@ -120,7 +58,7 @@ describe('vehicle', () => {
           const type = faker.vehicle.type();
 
           expect(type).toBeTruthy();
-          expect(typeof type).toBe('string');
+          expect(type).toBeTypeOf('string');
           expect(faker.definitions.vehicle.type).toContain(type);
         });
       });
@@ -130,20 +68,8 @@ describe('vehicle', () => {
           const fuel = faker.vehicle.fuel();
 
           expect(fuel).toBeTruthy();
-          expect(typeof fuel).toBe('string');
+          expect(fuel).toBeTypeOf('string');
           expect(faker.definitions.vehicle.fuel).toContain(fuel);
-        });
-      });
-
-      describe('vin()', () => {
-        it('should return valid vin number', () => {
-          const vin = faker.vehicle.vin();
-
-          expect(vin).toBeTruthy();
-          expect(typeof vin).toBe('string');
-          expect(vin).match(
-            /^([A-HJ-NPR-Z0-9]{10}[A-HJ-NPR-Z0-9]{1}[A-HJ-NPR-Z0-9]{1}\d{5})$/
-          );
         });
       });
 
@@ -152,8 +78,27 @@ describe('vehicle', () => {
           const color = faker.vehicle.color();
 
           expect(color).toBeTruthy();
-          expect(typeof color).toBe('string');
-          expect(faker.definitions.commerce.color).toContain(color);
+          expect(color).toBeTypeOf('string');
+          expect(faker.definitions.color.human).toContain(color);
+        });
+      });
+
+      describe('vin()', () => {
+        it('returns valid vin number', () => {
+          const vin = faker.vehicle.vin();
+          expect(vin).toMatch(
+            /^([A-HJ-NPR-Z0-9]{10}[A-HJ-NPR-Z0-9]{1}[A-HJ-NPR-Z0-9]{1}\d{5})$/
+          );
+        });
+
+        it('should return valid vin number', () => {
+          const vin = faker.vehicle.vin();
+
+          expect(vin).toBeTruthy();
+          expect(vin).toBeTypeOf('string');
+          expect(vin).toMatch(
+            /^([A-HJ-NPR-Z0-9]{10}[A-HJ-NPR-Z0-9]{1}[A-HJ-NPR-Z0-9]{1}\d{5})$/
+          );
         });
       });
 
@@ -162,8 +107,8 @@ describe('vehicle', () => {
           const vrm = faker.vehicle.vrm();
 
           expect(vrm).toBeTruthy();
-          expect(typeof vrm).toBe('string');
-          expect(vrm).match(/^[A-Z]{2}[0-9]{2}[A-Z]{3}$/);
+          expect(vrm).toBeTypeOf('string');
+          expect(vrm).toMatch(/^[A-Z]{2}[0-9]{2}[A-Z]{3}$/);
         });
       });
 
@@ -172,7 +117,7 @@ describe('vehicle', () => {
           const bicycle = faker.vehicle.bicycle();
 
           expect(bicycle).toBeTruthy();
-          expect(typeof bicycle).toBe('string');
+          expect(bicycle).toBeTypeOf('string');
           expect(faker.definitions.vehicle.bicycle_type).toContain(bicycle);
         });
       });

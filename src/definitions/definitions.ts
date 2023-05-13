@@ -1,111 +1,53 @@
-import type { AddressDefinitions } from './address';
-import { ADDRESS } from './address';
-import type { AnimalDefinitions } from './animal';
-import { ANIMAL } from './animal';
-import type { CommerceDefinitions } from './commerce';
-import { COMMERCE } from './commerce';
-import type { CompanyDefinitions } from './company';
-import { COMPANY } from './company';
-import type { DatabaseDefinitions } from './database';
-import { DATABASE } from './database';
-import type { DateDefinitions } from './date';
-import { DATE } from './date';
-import type { FinanceDefinitions } from './finance';
-import { FINANCE } from './finance';
-import type { HackerDefinitions } from './hacker';
-import { HACKER } from './hacker';
-import type { InternetDefinitions } from './internet';
-import { INTERNET } from './internet';
-import type { LoremDefinitions } from './lorem';
-import { LOREM } from './lorem';
-import type { MusicDefinitions } from './music';
-import { MUSIC } from './music';
-import type { NameDefinitions } from './name';
-import { NAME } from './name';
-import type { PhoneNumberDefinitions } from './phone_number';
-import { PHONE_NUMBER } from './phone_number';
-import type { SystemDefinitions } from './system';
-import { SYSTEM } from './system';
-import type { VehicleDefinitions } from './vehicle';
-import { VEHICLE } from './vehicle';
-import type { WordDefinitions } from './word';
-import { WORD } from './word';
+import type { AirlineDefinition } from './airline';
+import type { AnimalDefinition } from './animal';
+import type { ColorDefinition } from './color';
+import type { CommerceDefinition } from './commerce';
+import type { CompanyDefinition } from './company';
+import type { DatabaseDefinition } from './database';
+import type { DateDefinition } from './date';
+import type { FinanceDefinition } from './finance';
+import type { HackerDefinition } from './hacker';
+import type { InternetDefinition } from './internet';
+import type { LocationDefinition } from './location';
+import type { LoremDefinition } from './lorem';
+import type { MetadataDefinition } from './metadata';
+import type { MusicDefinition } from './music';
+import type { PersonDefinition } from './person';
+import type { PhoneNumberDefinition } from './phone_number';
+import type { ScienceDefinition } from './science';
+import type { SystemDefinition } from './system';
+import type { VehicleDefinition } from './vehicle';
+import type { WordDefinition } from './word';
 
 /**
- * The definitions as used by the Faker modules.
+ * Wrapper type for all definition categories that will make all properties optional and allow extra properties.
  */
-interface Definitions {
-  address: AddressDefinitions;
-  animal: AnimalDefinitions;
-  commerce: CommerceDefinitions;
-  company: CompanyDefinitions;
-  database: DatabaseDefinitions;
-  date: DateDefinitions;
-  finance: FinanceDefinitions;
-  hacker: HackerDefinitions;
-  internet: InternetDefinitions;
-  lorem: LoremDefinitions;
-  music: MusicDefinitions;
-  name: NameDefinitions;
-  phone_number: PhoneNumberDefinitions;
-  system: SystemDefinitions;
-  vehicle: VehicleDefinitions;
-  word: WordDefinitions;
-}
+export type LocaleEntry<TCategoryDefinition extends Record<string, unknown>> = {
+  [P in keyof TCategoryDefinition]?: TCategoryDefinition[P] | null;
+} & Record<string, unknown>; // Unsupported & custom entries
 
 /**
  * The definitions as used by the translations/locales.
- * This is basically the same as Definitions with the exception,
- * that most properties are optional and extra properties are allowed.
  */
 export type LocaleDefinition = {
-  /**
-   * The name of the language.
-   */
-  title: string;
-  separator?: string;
-} & {
-  // Known modules
-  [module in keyof Definitions]?: Partial<Definitions[module]>;
-} & {
-  // Unsupported & custom modules
-  [group: string]: Record<string, any> | string;
-};
-
-/**
- * Internal: Compatibility type to ensure all modules have access to fallback locales.
- * This should be replaced with a Proxy based property access
- * that don't require prior getter generation in the future.
- */
-export type DefinitionTypes = {
-  readonly title: string;
-  readonly separator: string;
-} & {
-  readonly [module in keyof Definitions]: Array<keyof Definitions[module]>;
-};
-
-/**
- * Internal: List off all modules and their properties,
- * that needs to have a fallback generated in Faker.loadDefinitions().
- */
-export const DEFINITIONS: DefinitionTypes = {
-  title: '',
-  separator: '',
-
-  address: ADDRESS,
-  animal: ANIMAL,
-  company: COMPANY,
-  commerce: COMMERCE,
-  database: DATABASE,
-  date: DATE,
-  finance: FINANCE,
-  hacker: HACKER,
-  internet: INTERNET,
-  lorem: LOREM,
-  music: MUSIC,
-  name: NAME,
-  phone_number: PHONE_NUMBER,
-  system: SYSTEM,
-  vehicle: VEHICLE,
-  word: WORD,
-};
+  metadata?: MetadataDefinition;
+  airline?: AirlineDefinition;
+  animal?: AnimalDefinition;
+  color?: ColorDefinition;
+  commerce?: CommerceDefinition;
+  company?: CompanyDefinition;
+  database?: DatabaseDefinition;
+  date?: DateDefinition;
+  finance?: FinanceDefinition;
+  hacker?: HackerDefinition;
+  internet?: InternetDefinition;
+  location?: LocationDefinition;
+  lorem?: LoremDefinition;
+  music?: MusicDefinition;
+  person?: PersonDefinition;
+  phone_number?: PhoneNumberDefinition;
+  science?: ScienceDefinition;
+  system?: SystemDefinition;
+  vehicle?: VehicleDefinition;
+  word?: WordDefinition;
+} & Record<string, Record<string, unknown> | undefined>;

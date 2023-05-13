@@ -3,23 +3,38 @@
  * Run 'pnpm run generate:locales' to update.
  */
 import type { LocaleDefinition } from '../..';
-import address from './address';
+import animal from './animal';
+import color from './color';
+import commerce from './commerce';
 import company from './company';
 import date from './date';
+import finance from './finance';
 import internet from './internet';
+import location from './location';
 import lorem from './lorem';
-import name_ from './name';
+import metadata from './metadata';
+import music from './music';
+import person from './person';
 import phone_number from './phone_number';
+import vehicle from './vehicle';
+import word from './word';
 
 const fr: LocaleDefinition = {
-  title: 'French',
-  address,
+  animal,
+  color,
+  commerce,
   company,
   date,
+  finance,
   internet,
+  location,
   lorem,
-  name: name_,
+  metadata,
+  music,
+  person,
   phone_number,
+  vehicle,
+  word,
 };
 
 export default fr;

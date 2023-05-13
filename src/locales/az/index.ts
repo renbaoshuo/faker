@@ -3,23 +3,25 @@
  * Run 'pnpm run generate:locales' to update.
  */
 import type { LocaleDefinition } from '../..';
-import address from './address';
+import color from './color';
 import commerce from './commerce';
 import company from './company';
 import date from './date';
 import internet from './internet';
-import name_ from './name';
+import location from './location';
+import metadata from './metadata';
+import person from './person';
 import phone_number from './phone_number';
 
 const az: LocaleDefinition = {
-  title: 'Azerbaijani',
-  separator: ' və ',
-  address,
+  color,
   commerce,
   company,
   date,
   internet,
-  name: name_,
+  location,
+  metadata,
+  person,
   phone_number,
 };
 

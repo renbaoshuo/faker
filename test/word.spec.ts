@@ -1,193 +1,131 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { faker } from '../src';
-
-const seededRuns = [
-  {
-    seed: 42,
-    expectations: {
-      adjective: {
-        noArgs: 'harmonious',
-        length10: 'gregarious',
-        length20: 'stable',
-      },
-      adverb: {
-        noArgs: 'jealously',
-        length10: 'generously',
-        length20: 'swiftly',
-      },
-      conjunction: {
-        noArgs: 'however',
-        length10: 'as much as',
-        length20: 'since',
-      },
-      interjection: {
-        noArgs: 'yahoo',
-        length10: 'ack',
-        length20: 'ack',
-      },
-      noun: {
-        noArgs: 'gale',
-        length10: 'exposition',
-        length20: 'shift',
-      },
-      preposition: {
-        noArgs: 'concerning',
-        length10: 'throughout',
-        length20: 'than',
-      },
-      verb: {
-        noArgs: 'function',
-        length10: 'exasperate',
-        length20: 'shred',
-      },
-    },
-  },
-  {
-    seed: 1337,
-    expectations: {
-      adjective: {
-        noArgs: 'fabulous',
-        length10: 'enchanting',
-        length20: 'neat',
-      },
-      adverb: {
-        noArgs: 'frankly',
-        length10: 'enormously',
-        length20: 'overconfidently',
-      },
-      conjunction: {
-        noArgs: 'even if',
-        length10: 'as long as',
-        length20: 'instead',
-      },
-      interjection: {
-        noArgs: 'ew',
-        length10: 'yippee',
-        length20: 'yippee',
-      },
-      noun: {
-        noArgs: 'digit',
-        length10: 'depressive',
-        length20: 'might',
-      },
-      preposition: {
-        noArgs: 'barring',
-        length10: 'concerning',
-        length20: 'midst',
-      },
-      verb: {
-        noArgs: 'dispense',
-        length10: 'demoralize',
-        length20: 'nearest',
-      },
-    },
-  },
-  {
-    seed: 1211,
-    expectations: {
-      adjective: {
-        noArgs: 'verifiable',
-        length10: 'unfinished',
-        length20: 'joyous',
-      },
-      adverb: {
-        noArgs: 'viciously',
-        length10: 'unbearably',
-        length20: 'loudly',
-      },
-      conjunction: {
-        noArgs: 'whereas',
-        length10: 'as soon as',
-        length20: 'in addition',
-      },
-      interjection: {
-        noArgs: 'er',
-        length10: 'gah',
-        length20: 'gah',
-      },
-      noun: {
-        noArgs: 'trick',
-        length10: 'trafficker',
-        length20: 'infection',
-      },
-      preposition: {
-        noArgs: 'upon',
-        length10: 'underneath',
-        length20: 'for',
-      },
-      verb: {
-        noArgs: 'trick',
-        length10: 'trampoline',
-        length20: 'intercede',
-      },
-    },
-  },
-];
+import { filterWordListByLength } from '../src/modules/word/filterWordListByLength';
+import { seededTests } from './support/seededRuns';
 
 const NON_SEEDED_BASED_RUN = 5;
 
-const functionNames = [
-  'adjective',
-  'adverb',
-  'conjunction',
-  'interjection',
-  'noun',
-  'preposition',
-  'verb',
-];
-
 describe('word', () => {
-  afterEach(() => {
-    faker.locale = 'en';
+  seededTests(faker, 'word', (t) => {
+    t.describeEach(
+      'adjective',
+      'adverb',
+      'conjunction',
+      'interjection',
+      'noun',
+      'preposition',
+      'verb',
+      'sample'
+    )((t) => {
+      t.it('noArgs')
+        .it('with length = 10', 10)
+        .it('with length = 20', 20)
+        .it('with options.length', { length: 10 })
+        .it('with options.strategy', { strategy: 'shortest' })
+        .it('with options.length and options.strategy', {
+          length: { min: 18, max: 20 },
+          strategy: 'closest',
+        });
+    });
+
+    t.describe('words', (t) => {
+      t.it('noArgs')
+        .it('with count = 10', 10)
+        .it('with count = 20', 20)
+        .it('with options.count', { count: 10 })
+        .it('with options.count range', { count: { min: 18, max: 20 } });
+    });
   });
 
-  for (const { seed, expectations } of seededRuns) {
-    describe(`seed: ${seed}`, () => {
-      for (const functionName of functionNames) {
-        it(`${functionName}()`, () => {
-          faker.seed(seed);
+  describe('filterWordListByLength', () => {
+    const wordList = ['foo', 'bar', 'baz', 'a', 'very-long', 'almostRight'];
+    const length = 10;
 
-          const actual = faker.word[functionName]();
-
-          expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
-          expect(actual).toEqual(expectations[functionName].noArgs);
-        });
-
-        it(`${functionName}(10)`, () => {
-          faker.seed(seed);
-
-          const actual = faker.word[functionName](10);
-
-          expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
-          expect(actual).toEqual(expectations[functionName].length10);
-        });
-
-        it(`${functionName}(20)`, () => {
-          faker.seed(seed);
-
-          const actual = faker.word[functionName](20);
-
-          expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
-          expect(actual).toEqual(expectations[functionName].length20);
-        });
-      }
+    it('returns the word list if no options are given', () => {
+      const result = filterWordListByLength({ wordList });
+      expect(result).toEqual(wordList);
     });
-  }
 
-  // Create and log-back the seed for debug purposes
-  faker.seed(Math.ceil(Math.random() * 1_000_000_000));
+    it('returns the words matching the given length', () => {
+      const result = filterWordListByLength({
+        wordList,
+        length: 3,
+      });
+      expect(result).toEqual(['foo', 'bar', 'baz']);
+    });
 
-  describe(`random seeded tests for seed ${faker.seedValue}`, () => {
+    it('returns the words matching the given length range', () => {
+      const result = filterWordListByLength({
+        wordList,
+        length: { min: 1, max: 3 },
+      });
+      expect(result).toEqual(['foo', 'bar', 'baz', 'a']);
+    });
+
+    it('returns the word list if no words match the length', () => {
+      const result = filterWordListByLength({
+        wordList,
+        length,
+      });
+      // TODO @ST-DDT 2022-10-02: This should throw an error in the next major version.
+      expect(result).toEqual(wordList);
+    });
+
+    it('returns the appropriate words when strategy is "any-length" and no words match the given length', () => {
+      const result = filterWordListByLength({
+        wordList,
+        length,
+        strategy: 'any-length',
+      });
+      expect(result).toEqual(wordList);
+    });
+
+    it('returns the appropriate words when strategy is "shortest" and no words match the given length', () => {
+      const result = filterWordListByLength({
+        wordList,
+        length,
+        strategy: 'shortest',
+      });
+      expect(result).toEqual(['a']);
+    });
+
+    it('returns the appropriate words when strategy is "longest" and no words match the given length', () => {
+      const result = filterWordListByLength({
+        wordList,
+        length,
+        strategy: 'longest',
+      });
+      expect(result).toEqual(['almostRight']);
+    });
+
+    it('returns the appropriate words when strategy is "closest" and no words match the given length', () => {
+      const result = filterWordListByLength({
+        wordList,
+        length: 10,
+        strategy: 'closest',
+      });
+      expect(result).toEqual(['very-long', 'almostRight']);
+    });
+
+    it('throws an error when strategy is "fail" and no words match the given length', () => {
+      expect(() => {
+        filterWordListByLength({
+          wordList,
+          length,
+          strategy: 'fail',
+        });
+      }).toThrow('No words found that match the given length.');
+    });
+  });
+
+  describe(`random seeded tests for seed ${faker.seed()}`, () => {
     for (let i = 1; i <= NON_SEEDED_BASED_RUN; i++) {
       describe(`adjective`, () => {
         it('should return adjective from adjective array', () => {
           const actual = faker.word.adjective();
 
           expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
+          expect(actual).toBeTypeOf('string');
           expect(faker.definitions.word.adjective).toContain(actual);
         });
       });
@@ -197,7 +135,7 @@ describe('word', () => {
           const actual = faker.word.adverb();
 
           expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
+          expect(actual).toBeTypeOf('string');
           expect(faker.definitions.word.adverb).toContain(actual);
         });
       });
@@ -207,7 +145,7 @@ describe('word', () => {
           const actual = faker.word.conjunction();
 
           expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
+          expect(actual).toBeTypeOf('string');
           expect(faker.definitions.word.conjunction).toContain(actual);
         });
       });
@@ -217,7 +155,7 @@ describe('word', () => {
           const actual = faker.word.interjection();
 
           expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
+          expect(actual).toBeTypeOf('string');
           expect(faker.definitions.word.interjection).toContain(actual);
         });
       });
@@ -227,7 +165,7 @@ describe('word', () => {
           const actual = faker.word.noun();
 
           expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
+          expect(actual).toBeTypeOf('string');
           expect(faker.definitions.word.noun).toContain(actual);
         });
       });
@@ -237,7 +175,7 @@ describe('word', () => {
           const actual = faker.word.preposition();
 
           expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
+          expect(actual).toBeTypeOf('string');
           expect(faker.definitions.word.preposition).toContain(actual);
         });
       });
@@ -247,7 +185,7 @@ describe('word', () => {
           const actual = faker.word.verb();
 
           expect(actual).toBeTruthy();
-          expect(typeof actual).toBe('string');
+          expect(actual).toBeTypeOf('string');
           expect(faker.definitions.word.verb).toContain(actual);
         });
       });

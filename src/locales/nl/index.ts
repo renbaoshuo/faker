@@ -3,26 +3,29 @@
  * Run 'pnpm run generate:locales' to update.
  */
 import type { LocaleDefinition } from '../..';
-import address from './address';
+import color from './color';
 import commerce from './commerce';
 import company from './company';
 import date from './date';
 import hacker from './hacker';
 import internet from './internet';
+import location from './location';
 import lorem from './lorem';
-import name_ from './name';
+import metadata from './metadata';
+import person from './person';
 import phone_number from './phone_number';
 
 const nl: LocaleDefinition = {
-  title: 'Dutch',
-  address,
+  color,
   commerce,
   company,
   date,
   hacker,
   internet,
+  location,
   lorem,
-  name: name_,
+  metadata,
+  person,
   phone_number,
 };
 

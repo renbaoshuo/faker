@@ -3,21 +3,24 @@
  * Run 'pnpm run generate:locales' to update.
  */
 import type { LocaleDefinition } from '../..';
-import address from './address';
 import cell_phone from './cell_phone';
 import company from './company';
 import internet from './internet';
-import name_ from './name';
+import location from './location';
+import metadata from './metadata';
+import person from './person';
 import phone_number from './phone_number';
+import word from './word';
 
 const de_AT: LocaleDefinition = {
-  title: 'German (Austria)',
-  address,
   cell_phone,
   company,
   internet,
-  name: name_,
+  location,
+  metadata,
+  person,
   phone_number,
+  word,
 };
 
 export default de_AT;

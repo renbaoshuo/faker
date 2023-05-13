@@ -1,1 +1,1 @@
-export default ['#{Name.name}', '#{Company.name}'];
+export default ['{{person.name}}', '{{company.name}}'];

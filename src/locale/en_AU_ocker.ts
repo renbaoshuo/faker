@@ -3,17 +3,12 @@
  * Run 'pnpm run generate:locales' to update.
  */
 
-import { Faker } from '..';
-import en_AU_ocker from '../locales/en_AU_ocker';
+import { Faker } from '../faker';
+import base from '../locales/base';
 import en from '../locales/en';
+import en_AU from '../locales/en_AU';
+import en_AU_ocker from '../locales/en_AU_ocker';
 
-const faker = new Faker({
-  locale: 'en_AU_ocker',
-  localeFallback: 'en',
-  locales: {
-    en_AU_ocker,
-    en,
-  },
+export const faker = new Faker({
+  locale: [en_AU_ocker, en_AU, en, base],
 });
-
-export = faker;

@@ -3,8 +3,11 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - next
   pull_request:
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
 
 jobs:
   unit-test:
@@ -12,26 +15,91 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node_version: [14, 16, 17]
+        node_version: [14, 16, 18, 20]
         include:
           - os: macos-latest
             node_version: 16
+          - os: macos-latest
+            node_version: 18
+          - os: macos-latest
+            node_version: 20
           - os: windows-latest
             node_version: 16
+          - os: windows-latest
+            node_version: 18
+          - os: windows-latest
+            node_version: 20
       fail-fast: false
+    timeout-minutes: 10
 
     name: 'Build & Unit Test: node-${{ matrix.node_version }}, ${{ matrix.os }}'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          # Required for docs/versions tests
+          fetch-depth: 0
+
+      - name: Install pnpm (node 14, pnpm 7)
+        if: matrix.node_version == 14
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6
+        if: matrix.node_version != 14
+        uses: pnpm/action-setup@v2.2.4
 
       - name: Set node version to ${{ matrix.node_version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm run test
+
+  timezone-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node_version: [18]
+      fail-fast: false
+    env:
+      LANG: zh_SG.UTF-8
+      TZ: Asia/Singapore
+    timeout-minutes: 10
+
+    name: 'Timezone Test: node-${{ matrix.node_version }}, ${{ matrix.os }}'
+    steps:
+      - name: Set system LANG=zh_SG.UTF-8
+        run: |
+          sudo locale-gen zh_SG.UTF-8
+          sudo update-locale LANG=zh_SG.UTF-8
+
+      - name: Check date
+        run: date
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          # Required for docs/versions tests
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.4
+
+      - name: Set node version to ${{ matrix.node_version }}
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
           cache: 'pnpm'
@@ -49,40 +117,43 @@ jobs:
 
   e2e-test:
     runs-on: ubuntu-latest
-    name: 'E2E Doc Test: node-16, ubuntu-latest'
+    container: cypress/browsers:node18.12.0-chrome107
+    timeout-minutes: 10
+    name: 'E2E Doc Test: node-18, ubuntu-latest'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6
+        uses: pnpm/action-setup@v2.2.4
 
       - name: Install deps
         run: pnpm install
 
-      - name: Run E2E
+      - name: Build docs
         run: pnpm run docs:build:ci
+
+      - id: e2e
+        name: Run e2e
+        run: pnpm run docs:test:e2e:run
 
   lint:
     runs-on: ubuntu-latest
-    name: 'Lint: node-16, ubuntu-latest'
+    timeout-minutes: 10
+    name: 'Lint: node-18, ubuntu-latest'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6
+        uses: pnpm/action-setup@v2.2.4
 
-      - name: Set node version to 16
-        uses: actions/setup-node@v2
+      - name: Set node version to 18
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install deps
@@ -96,24 +167,77 @@ jobs:
       - name: Check formatting
         run: pnpm prettier --check .
 
-  codecov:
+  ts-check-scripts:
     runs-on: ubuntu-latest
-    name: 'Codecov: node-16, ubuntu-latest'
+    timeout-minutes: 10
+    name: 'TS-Check Scripts: node-18, ubuntu-latest'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6
+        uses: pnpm/action-setup@v2.2.4
 
-      - name: Set node version to 16
-        uses: actions/setup-node@v2
+      - name: Set node version to 18
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+
+      - name: Check scripts
+        run: pnpm run ts-check:scripts
+
+  ts-check-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    name: 'TS-Check Tests: node-18, ubuntu-latest'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.4
+
+      - name: Set node version to 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+
+      - name: Check tests
+        run: pnpm run ts-check:tests
+
+  codecov:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    name: 'Codecov: node-18, ubuntu-latest'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.4
+
+      - name: Set node version to 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install deps
@@ -128,7 +252,7 @@ jobs:
         run: pnpm vitest run --coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2.1.0
+        uses: codecov/codecov-action@v3.1.3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true

@@ -1,143 +1,116 @@
 import validator from 'validator';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { faker } from '../src';
-
-const seededRuns = [
-  {
-    seed: 42,
-    expectations: {
-      branch: {
-        noArgs: 'array-transmit',
-      },
-      commitEntry: {
-        noArgs: '',
-      },
-      commitMessage: {
-        noArgs: 'navigate neural capacitor',
-      },
-      commitSha: {
-        noArgs: '5cf2bc99272107d592ba00fbdf302f2949806048',
-      },
-      shortSha: {
-        noArgs: '5cf2bc9',
-      },
-    },
-  },
-  {
-    seed: 1337,
-    expectations: {
-      branch: {
-        noArgs: 'port-quantify',
-      },
-      commitEntry: {
-        noArgs: '',
-      },
-      commitMessage: {
-        noArgs: 'compress multi-byte panel',
-      },
-      commitSha: {
-        noArgs: '48234870538945f4b41c61a52bf27dccc0576698',
-      },
-      shortSha: {
-        noArgs: '4823487',
-      },
-    },
-  },
-  {
-    seed: 1211,
-    expectations: {
-      branch: {
-        noArgs: 'capacitor-connect',
-      },
-      commitEntry: {
-        noArgs: '',
-      },
-      commitMessage: {
-        noArgs: 'reboot online circuit',
-      },
-      commitSha: {
-        noArgs: 'e7ec32f0a2a3c652bbd0caabde64dfdf379e3259',
-      },
-      shortSha: {
-        noArgs: 'e7ec32f',
-      },
-    },
-  },
-];
+import { seededTests } from './support/seededRuns';
 
 const NON_SEEDED_BASED_RUN = 5;
 
-const functionNames = [
-  'branch',
-  'commitEntry',
-  'commitMessage',
-  'commitSha',
-  'shortSha',
-];
+const refDate = '2020-01-01T00:00:00.000Z';
 
 describe('git', () => {
-  afterEach(() => {
-    faker.locale = 'en';
+  seededTests(faker, 'git', (t) => {
+    t.itEach('branch', 'commitMessage');
+
+    t.describe('commitSha', (t) => {
+      t.it('noArgs')
+        .it('with length 7', { length: 7 })
+        .it('with length 8', { length: 8 });
+    });
+
+    t.skip('shortSha');
+
+    t.describeEach(
+      'commitEntry',
+      'commitDate'
+    )((t) => {
+      t.it('with only string refDate', { refDate })
+        .it('with only Date refDate', { refDate: new Date(refDate) })
+        .it('with only number refDate', {
+          refDate: new Date(refDate).getTime(),
+        });
+    });
   });
 
-  for (const { seed, expectations } of seededRuns) {
-    describe(`seed: ${seed}`, () => {
-      for (const functionName of functionNames) {
-        if (functionName === 'commitEntry') {
-          it.todo(`${functionName}()`);
-          continue;
-        }
-
-        it(`${functionName}()`, () => {
-          faker.seed(seed);
-
-          const actual = faker.git[functionName]();
-          expect(actual).toEqual(expectations[functionName].noArgs);
-        });
-      }
-    });
-  }
-
-  // Create and log-back the seed for debug purposes
-  faker.seed(Math.ceil(Math.random() * 1_000_000_000));
-
-  describe(`random seeded tests for seed ${faker.seedValue}`, () => {
+  describe(`random seeded tests for seed ${faker.seed()}`, () => {
     for (let i = 1; i <= NON_SEEDED_BASED_RUN; i++) {
       describe('branch()', () => {
         it('should return a random branch', () => {
           const branch = faker.git.branch();
 
           expect(branch).toBeTruthy();
-          expect(typeof branch).toBe('string');
-          expect(branch).satisfy(validator.isSlug);
+          expect(branch).toBeTypeOf('string');
+          expect(branch).toSatisfy(validator.isSlug);
         });
       });
 
       describe('commitEntry', () => {
-        it('should return a random commitEntry', () => {
+        it('should return a valid random commitEntry', () => {
           const commitEntry = faker.git.commitEntry();
 
           expect(commitEntry).toBeTruthy();
-          expect(typeof commitEntry).toBe('string');
+          expect(commitEntry).toBeTypeOf('string');
 
           const parts = commitEntry.split(/\r?\n/);
 
-          expect(parts.length).greaterThanOrEqual(6);
-          expect(parts.length).lessThanOrEqual(7);
+          expect(parts.length).toBeGreaterThanOrEqual(6);
+          expect(parts.length).toBeLessThanOrEqual(7);
 
-          expect(parts[0]).match(/^commit [a-f0-9]+$/);
+          expect(parts[0]).toMatch(/^commit [a-f0-9]+$/);
+          const isValidAuthor = (email: string) => {
+            // `validator.isEmail()` does not support display names
+            // that contain unquoted characters like . output by Git so we need
+            // to quote the display name
+            const quotedEmail = email.replace(/^(.*) </, '"$1" <');
+            return validator.isEmail(quotedEmail, {
+              require_display_name: true,
+            });
+          };
+
+          const authorRegex = /^Author: .*$/;
           if (parts.length === 7) {
-            expect(parts[1]).match(/^Merge: [a-f0-9]+ [a-f0-9]+$/);
-            expect(parts[2]).match(/^Author: \w+ \w+ \<[\w\.]+@[\w\.]+\>$/);
-            expect(parts[3]).match(/^Date: .+$/);
+            expect(parts[1]).toMatch(/^Merge: [a-f0-9]+ [a-f0-9]+$/);
+            expect(parts[2]).toMatch(authorRegex);
+            expect(parts[2].substring(8)).toSatisfy(isValidAuthor);
+            expect(parts[3]).toMatch(/^Date: .+$/);
             expect(parts[4]).toBe('');
-            expect(parts[5]).match(/^\s{4}.+$/);
+            expect(parts[5]).toMatch(/^\s{4}.+$/);
           } else {
-            expect(parts[1]).match(/^Author: \w+ \w+ \<[\w\.]+@[\w\.]+\>$/);
-            expect(parts[2]).match(/^Date: .+$/);
+            expect(parts[1]).toMatch(authorRegex);
+            expect(parts[1].substring(8)).toSatisfy(isValidAuthor);
+            expect(parts[2]).toMatch(/^Date: .+$/);
             expect(parts[3]).toBe('');
-            expect(parts[4]).match(/^\s{4}.+$/);
+            expect(parts[4]).toMatch(/^\s{4}.+$/);
           }
+        });
+
+        it('should return a random commitEntry with a default end of line character of "\r\n"', () => {
+          const commitEntry = faker.git.commitEntry();
+          const parts = commitEntry.split('\r\n');
+
+          expect(parts.length).toBeGreaterThanOrEqual(6);
+          expect(parts.length).toBeLessThanOrEqual(7);
+        });
+
+        it('should return a random commitEntry with a configured end of line character of "\r\n" with eol = CRLF', () => {
+          const commitEntry = faker.git.commitEntry({
+            eol: 'CRLF',
+          });
+          const parts = commitEntry.split('\r\n');
+
+          expect(parts.length).toBeGreaterThanOrEqual(6);
+          expect(parts.length).toBeLessThanOrEqual(7);
+        });
+
+        it('should return a random commitEntry with a configured end of line character of "\n" with eol = LF', () => {
+          const commitEntry = faker.git.commitEntry({
+            eol: 'LF',
+          });
+          const parts = commitEntry.split('\n');
+
+          expect(parts.length).toBeGreaterThanOrEqual(6);
+          expect(parts.length).toBeLessThanOrEqual(7);
+
+          expect(commitEntry).not.contains('\r\n');
         });
       });
 
@@ -146,33 +119,49 @@ describe('git', () => {
           const commitMessage = faker.git.commitMessage();
 
           expect(commitMessage).toBeTruthy();
-          expect(typeof commitMessage).toBe('string');
+          expect(commitMessage).toBeTypeOf('string');
 
           const parts = commitMessage.split(' ');
-          expect(parts.length).greaterThanOrEqual(3);
+          expect(parts.length).toBeGreaterThanOrEqual(3);
+        });
+      });
+
+      describe('commitDate', () => {
+        it('should return a random commitDate', () => {
+          const commitDate = faker.git.commitDate();
+
+          expect(commitDate).toBeTruthy();
+          expect(commitDate).toBeTypeOf('string');
+
+          const parts = commitDate.split(' ');
+          expect(parts.length).toBe(6);
         });
       });
 
       describe('commitSha', () => {
-        it('should return a random commitSha', () => {
+        it('should return a random full commitSha', () => {
           const commitSha = faker.git.commitSha();
 
           expect(commitSha).toBeTruthy();
-          expect(typeof commitSha).toBe('string');
-          expect(commitSha).satisfy(validator.isHexadecimal);
+          expect(commitSha).toBeTypeOf('string');
+          expect(commitSha).toSatisfy(validator.isHexadecimal);
           expect(commitSha).toHaveLength(40);
         });
-      });
 
-      describe('shortSha', () => {
-        it('should return a random shortSha', () => {
-          const shortSha = faker.git.shortSha();
+        it.each([
+          ['GitHub', 7],
+          ['GitLab', 8],
+        ])(
+          'should return a random short commitSha for %s',
+          (_provider, length) => {
+            const commitSha = faker.git.commitSha({ length });
 
-          expect(shortSha).toBeTruthy();
-          expect(typeof shortSha).toBe('string');
-          expect(shortSha).satisfy(validator.isHexadecimal);
-          expect(shortSha).toHaveLength(7);
-        });
+            expect(commitSha).toBeTruthy();
+            expect(commitSha).toBeTypeOf('string');
+            expect(commitSha).toSatisfy(validator.isHexadecimal);
+            expect(commitSha).toHaveLength(length);
+          }
+        );
       });
     }
   });

@@ -3,22 +3,25 @@
  * Run 'pnpm run generate:locales' to update.
  */
 import type { LocaleDefinition } from '../..';
-import address from './address';
 import cell_phone from './cell_phone';
+import color from './color';
 import commerce from './commerce';
 import internet from './internet';
+import location from './location';
 import lorem from './lorem';
-import name_ from './name';
+import metadata from './metadata';
+import person from './person';
 import phone_number from './phone_number';
 
 const tr: LocaleDefinition = {
-  title: 'Turkish',
-  address,
   cell_phone,
+  color,
   commerce,
   internet,
+  location,
   lorem,
-  name: name_,
+  metadata,
+  person,
   phone_number,
 };
 

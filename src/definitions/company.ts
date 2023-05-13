@@ -1,50 +1,48 @@
-import { allOf } from './utils';
+import type { LocaleEntry } from './definitions';
 
 /**
  * The possible definitions related to companies.
  */
-export interface CompanyDefinitions {
+export type CompanyDefinition = LocaleEntry<{
   /**
-   * Business/products related adjectives.
+   * Business/products related adjectives that can be used to demonstrate data being viewed by a manager.
    */
-  bs_adjective: string[];
+  buzz_adjective: string[];
+
   /**
-   * Business/products related nouns.
+   * Business/products related nouns that can be used to demonstrate data being viewed by a manager.
    */
-  bs_noun: string[];
+  buzz_noun: string[];
+
   /**
-   * Business/products related verbs.
+   * Business/products related verbs that can be used to demonstrate data being viewed by a manager.
    */
-  bs_verb: string[];
+  buzz_verb: string[];
+
   /**
-   * Catch phrase adjectives.
+   * Catchphrase adjectives that can be displayed to an end user.
    */
   adjective: string[];
+
   /**
-   * Catch phrase adjectives.
+   * Catchphrase descriptors that can be displayed to an end user.
    */
   descriptor: string[];
+
   /**
-   * Catch phrase adjectives.
+   * A list of patterns used to generate company names.
+   */
+  name_pattern: string[];
+
+  /**
+   * Catchphrase nouns that can be displayed to an end user.
    */
   noun: string[];
+
   /**
-   * Company suffixes
+   * Company/Business entity types.
+   *
+   * @deprecated Use `faker.company.name` instead.
    */
   suffix: string[];
-}
-
-/**
- * Internal: A list of all keys for the CompanyDefinitions.
- */
-export const COMPANY = allOf<keyof CompanyDefinitions>()(
-  'bs_adjective',
-  'bs_noun',
-  'bs_verb',
-
-  'adjective',
-  'descriptor',
-  'noun',
-
-  'suffix'
-);
+}>;
